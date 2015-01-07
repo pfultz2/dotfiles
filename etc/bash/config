@@ -1,6 +1,8 @@
 
-source colors
-source prompt
+DOTFILES=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/../.. && pwd )
 
-PS1="\[$Red\]$PROMPT_TIME \[$Green\]$PROMPT_USER\n\[$Blue\]$PROMPT_CURRENT_WORKING_DIR \[$Yellow\]$(parse_git_branch)"
+source $DOTFILES/etc/bash/colors
+source $DOTFILES/etc/bash/prompt
+
+PS1="\[$Red\]$PROMPT_TIME \[$Green\]$PROMPT_USER\n\[$Blue\]$PROMPT_CURRENT_WORKING_DIR \[$Yellow\]$(parse_git_branch)\[$Color_Off\]$ "
 PS2='\[\033[01;36m\]>'
