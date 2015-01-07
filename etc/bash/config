@@ -1,0 +1,6 @@
+
+source colors
+source prompt
+
+PS1="\[$Red\]$PROMPT_TIME \[$Green\]$PROMPT_USER\n\[$Blue\]$PROMPT_CURRENT_WORKING_DIR \[$Yellow\]$(parse_git_branch)"
+PS2='\[\033[01;36m\]>'

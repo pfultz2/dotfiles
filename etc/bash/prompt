@@ -1,0 +1,31 @@
+PROMPT_DATE='\d'                     # the date  in  "Weekday  Month  Date"  format (e.g., "Tue May 26")
+PROMPT_ESCAPE='\e'                   # an ASCII escape character (033)
+PROMPT_SHORT_HOST='\h'               # the hostname up to the first `.'
+PROMPT_HOST='\H'                     # the hostname
+PROMPT_JOBS='\j'                     # the  number of jobs currently managed by the shell
+PROMPT_DEVICE_NAME='\l'              # the basename of the shell's terminal  device name
+PROMPT_SHELL_NAME='\s'               # the  name  of  the shell, the basename of $0 (the portion following the final slash)
+PROMPT_TIME_24='\t'                  # the current time in 24-hour HH:MM:SS format
+PROMPT_TIME_12='\T'                  # the current time in 12-hour HH:MM:SS format
+PROMPT_TIME='\@'                     # the current time in 12-hour am/pm format
+PROMPT_USER='\u'                     # the username of the current user
+PROMPT_BASH_VERSION='\v'             # the version of bash (e.g., 2.00)
+PROMPT_BASH_INFO='\V'                # the release of bash,  version  +  patchlevel (e.g., 2.00.0)
+PROMPT_CURRENT_WORKING_DIR='\w'      # the current working directory
+PROMPT_BASE_CURRENT_WORKING_DIR='\W' # the  basename  of the current working direc­tory
+PROMPT_HISTORY_NUMBER='\!'           # the history number of this command
+PROMPT_BEGIN='\['                    # begin a sequence of non-printing characters, which could be used to embed a terminal con­trol sequence into the prompt
+PROMPT_END='\]'                      # end a sequence of non-printing characters
+PROMPT_NEW_LINE='\n'
+
+# get current branch in git repo
+function parse_git_branch() {
+    BRANCH=`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
+    if [ ! "${BRANCH}" == "" ]
+    then
+        echo "[${BRANCH}]"
+    else
+        echo ""
+    fi
+}
+
