@@ -1,0 +1,37 @@
+[color]
+    ui = auto
+[color "branch"]
+    current = yellow bold
+    local = green bold
+    remote = cyan bold
+[color "diff"]
+    meta = yellow bold
+    frag = magenta bold
+    old = red bold
+    new = green bold
+    whitespace = red reverse
+[color "status"]
+    added = green bold
+    changed = yellow bold
+    untracked = red bold
+[push]
+    default = simple
+[user]
+    name = Paul
+    email = pfultz2@yahoo.com
+[alias]
+    st = status
+    ci = commit
+    cm = commit -m
+    cma = commit -a -m
+    br = branch
+    co = checkout
+    df = diff
+    ls = ls-files
+    lsm = ls-files -m
+    lsd = ls-files -d
+    lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+    forkdiff = !bash -c 'git diff $(git merge-base "$1" "$(git rev-parse --abbrev-ref HEAD)") "$(git rev-parse --abbrev-ref HEAD)" "${@: 3}" ' -
+    forkdiff2 = !bash -c 'git diff $(git merge-base "$1" "$2") "$2" "${@: 3}" ' -
+[push]
+    default = current
