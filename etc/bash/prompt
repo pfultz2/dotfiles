@@ -29,3 +29,4 @@ function parse_git_branch() {
     fi
 }
 
+PROMPT_BRANCH='$(parse_git_branch)'
