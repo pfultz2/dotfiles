@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-source ~/bin/remote-setup.sh
+source $DOTFILES/bin/remote-setup.sh
 
 rsync --verbose --recursive --times --compress --progress \
     --exclude ".hg" \

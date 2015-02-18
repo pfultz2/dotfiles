@@ -1,5 +1,5 @@
-#!/bin/sh
+#!/bin/bash
 
-source ~/bin/remote-setup.sh
+source $DOTFILES/bin/remote-setup.sh
 
 ssh $HOST "cd $DEST_DIR && $*"

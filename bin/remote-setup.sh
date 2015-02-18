@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 REMOTE_DIR=`cd ~/remote/ && pwd`
 CURR_DIR=`pwd`

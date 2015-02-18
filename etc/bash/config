@@ -1,5 +1,7 @@
 
-DOTFILES=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/../.. && pwd )
+export DOTFILES=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/../.. && pwd )
+
+export PATH="$DOTFILES/bin:$PATH"
 
 source $DOTFILES/etc/bash/colors
 source $DOTFILES/etc/bash/prompt
