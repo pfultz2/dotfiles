@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Ignore errors, write the results to standard output.
+if [ "$#" -eq 1 ]; then
+    hxnormalize -l 240 -x 2>/dev/null | hxselect -s '\n' -c "$2"
+fi
+
+if [ "$#" -eq 2 ]; then
+    hxnormalize -l 240 -x $1 2>/dev/null | hxselect -s '\n' -c "$2"
+fi
