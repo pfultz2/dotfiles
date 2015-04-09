@@ -3,6 +3,14 @@ export DOTFILES=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/../.. && pwd )
 
 export PATH="$DOTFILES/bin:$PATH"
 
+if [ "$(uname)" == "Darwin" ]; then
+    source $DOTFILES/etc/bash/mac
+elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+    source $DOTFILES/etc/bash/linux
+elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ]; then
+    source $DOTFILES/etc/bash/mingw
+fi
+
 source $DOTFILES/etc/bash/colors
 source $DOTFILES/etc/bash/prompt
 
