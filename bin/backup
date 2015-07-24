@@ -1,0 +1,37 @@
+#!/bin/bash
+date=`date "+%Y-%m-%dT%H_%M_%S"`
+SOURCE=$HOME
+BACKUP=`hostname`
+HOST=backup
+BWLIMITKBYTES=96000
+MAXSIZE=1024m
+DEST=`ssh $HOST 'echo $HOME/backup'`
+
+echo "rsync -avzx --partial --progress --delete --delete-excluded \
+-e ssh \
+--exclude-from=\"$DOTFILES/etc/rsync/exclude\" \
+--link-dest=\"$DEST/$BACKUP/current\" \
+--bwlimit=$BWLIMITKBYTES \
+--max-size=$MAXSIZE \
+--log-file=$SOURCE/.rsync/backuplog \
+\"$SOURCE\" $HOST:$DEST/$BACKUP/incomplete_backup \
+&& ssh $HOST \
+\"mv $DEST/$BACKUP/incomplete_backup $DEST/$BACKUP/backup-$date \
+&& rm -f $DEST/$BACKUP/current \
+&& ln -s $DEST/$BACKUP/backup-$date $DEST/$BACKUP/current\""
+
+ssh $HOST \
+"mkdir -p $DEST/$BACKUP/incomplete_backup"
+
+rsync -avzx --partial --delete --progress --delete-excluded \
+-e ssh \
+--exclude-from="$DOTFILES/etc/rsync/exclude" \
+--link-dest="$DEST/$BACKUP/current" \
+--bwlimit=$BWLIMITKBYTES \
+--max-size=$MAXSIZE \
+"$SOURCE" $HOST:$DEST/$BACKUP/incomplete_backup \
+&& ssh $HOST \
+"mv $DEST/$BACKUP/incomplete_backup $DEST/$BACKUP/backup-$date \
+&& rm -f $DEST/$BACKUP/current \
+&& ln -s $DEST/$BACKUP/backup-$date $DEST/$BACKUP/current"
+# --log-file=$SOURCE/.rsync/backuplog \

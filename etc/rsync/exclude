@@ -1,0 +1,17 @@
+*cache*
+*Cache*
+temp*
+*/.Trash/*
+*/.thumbnails/*
+*/.cache/mozilla/*
+*/.cache/chromium/*
+*/.local/share/Trash/*
+*/.gvfs
+/dev/*
+/proc/*
+/sys/*
+/tmp/*
+/run/*
+/mnt/*
+/media/*
+/lost+found

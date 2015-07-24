@@ -11,6 +11,8 @@ elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ]; then
     source $DOTFILES/etc/bash/mingw
 fi
 
+export EDITOR="subl -w"
+
 source $DOTFILES/etc/bash/colors
 source $DOTFILES/etc/bash/prompt
 
