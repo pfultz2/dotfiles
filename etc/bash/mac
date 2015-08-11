@@ -13,10 +13,6 @@ export PATH="$PATH:/Applications/Sublime Text.app/Contents/SharedSupport/bin"
 # alias dumpclip='xclip -selection clipboard -o'
 # alias pushclip='xclip -selection clipboard'
 
-# Add completions for ssh hosts
-complete -o default -o nospace -W "$(/usr/bin/env ruby -ne 'puts $_.split(/[,\s]+/)[1..-1].reject{|host| host.match(/\*|\?/)} if $_.match(/^\s*Host\s+/);' < $HOME/.ssh/config)" scp sftp ssh
-
-
 if [ -f `brew --prefix`/etc/bash_completion ]; then
     . `brew --prefix`/etc/bash_completion
 fi
@@ -32,3 +28,6 @@ complete -o default -F _pip_completion pip
 # pip bash completion end
 
 # source /usr/local/bin/virtualenvwrapper.sh
+
+# Add completions for ssh hosts
+complete -o default -o nospace -W "$(/usr/bin/env ruby -ne 'puts $_.split(/[,\s]+/)[1..-1].reject{|host| host.match(/\*|\?/)} if $_.match(/^\s*Host\s+/);' < $HOME/.ssh/config)" scp sftp ssh

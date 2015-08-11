@@ -11,6 +11,13 @@ elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ]; then
     source $DOTFILES/etc/bash/mingw
 fi
 
+function docker-use {
+    eval "$(docker-machine env $1)"
+}
+
+# TODO: Make this a script
+alias fig='docker-compose -f fig.yml'
+
 export EDITOR="subl -w"
 
 source $DOTFILES/etc/bash/colors
