@@ -1,7 +1,7 @@
 
 export DOTFILES=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/../.. && pwd )
 
-export PATH="$DOTFILES/bin:$PATH"
+export PATH="~/bin:$DOTFILES/bin:$PATH"
 
 if [ "$(uname)" == "Darwin" ]; then
     source $DOTFILES/etc/bash/mac
