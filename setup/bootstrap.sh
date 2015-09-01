@@ -2,10 +2,11 @@
 
 export DOTFILES=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. && pwd )
 
+echo "Add to bash profile: source $DOTFILES/etc/bash/config"
 if [ "$(uname)" == "Darwin" ]; then
-    echo "source $DOTFILES/etc/bash/config" >> .bash_profile
+    echo "source $DOTFILES/etc/bash/config" >> ~/.bash_profile
 else
-    echo "source $DOTFILES/etc/bash/config" >> .bashrc
+    echo "source $DOTFILES/etc/bash/config" >> ~/.bashrc
 fi
-
-ln -s $DOTFILES/etc/git/config .gitconfig
+echo "Link git configuration"
+ln -s $DOTFILES/etc/git/config ~/.gitconfig
