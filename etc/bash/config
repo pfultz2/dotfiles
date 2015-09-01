@@ -11,6 +11,9 @@ elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ]; then
     source $DOTFILES/etc/bash/mingw
 fi
 
+# colored GCC warnings and errors
+export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
 function docker-use {
     eval "$(docker-machine env $1)"
 }
