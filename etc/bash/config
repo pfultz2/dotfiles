@@ -18,6 +18,11 @@ function docker-use {
     eval "$(docker-machine env $1)"
 }
 
+mkcdir () {
+    mkdir -p -- "$1" &&
+      cd -P -- "$1"
+}
+
 # TODO: Make this a script
 alias fig='docker-compose -f fig.yml'
 
