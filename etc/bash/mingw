@@ -1,0 +1,2 @@
+# alias subl=/c/Program\ Files/Sublime\ Text\ 3/subl.exe
+export PATH="$PATH:/c/Program Files/Sublime Text 3/"
