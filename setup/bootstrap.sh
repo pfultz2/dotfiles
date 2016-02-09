@@ -7,6 +7,8 @@ if [ "$(uname)" == "Darwin" ]; then
     echo "source $DOTFILES/etc/bash/config" >> ~/.bash_profile
 elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ]; then
 	echo "source $DOTFILES/etc/bash/config" >> ~/.bash_profile
+elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
+	echo "source $DOTFILES/etc/bash/config" >> ~/.bash_profile
 else
     echo "source $DOTFILES/etc/bash/config" >> ~/.bashrc
 fi
