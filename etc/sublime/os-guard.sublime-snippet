@@ -12,9 +12,10 @@
 
 namespace ${1:project_name} {
 ${2}
-}
+} // namespace ${1:project_name}
 
 #endif
+
 ]]></content>
     <!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
     <tabTrigger>guard</tabTrigger>
