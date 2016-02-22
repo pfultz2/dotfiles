@@ -1,37 +1,74 @@
 
 export DOTFILES=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/../.. && pwd )
 
-export PATH="~/usr/bin:~/.local/bin:~/bin:$DOTFILES/bin:$PATH"
+export PATH="~/usr/bin:~/.local/bin:~/bin:$DOTFILES/bin:/usr/local/bin:$PATH"
 
-if [ "$(uname)" == "Darwin" ]; then
+# OS variables
+[ $(uname -s) = "Darwin" ] && export OSX=1 && export UNIX=1
+[ $(uname -s) = "Linux" ] && export LINUX=1 && export UNIX=1
+uname -s | grep -q "_NT-" && export WINDOWS=1
+
+# Fix systems missing $USER
+[ -z "$USER" ] && export USER=$(whoami)
+
+if [ $OSX ]; then
     source $DOTFILES/etc/bash/mac
-elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+elif [ $LINUX ]; then
     source $DOTFILES/etc/bash/linux
-elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ]; then
+elif [ $WINDOWS ]; then
     source $DOTFILES/etc/bash/mingw
-elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
-    source $DOTFILES/etc/bash/mingw
+fi
+
+# Count CPUs for Make jobs
+if [ $OSX ]
+then
+  export CPUCOUNT=$(sysctl -n hw.ncpu)
+elif [ $LINUX ]
+then
+  export CPUCOUNT=$(nproc)
+else
+  export CPUCOUNT="1"
 fi
 
 # colored GCC warnings and errors
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
-function docker-use {
-    eval "$(docker-machine env $1)"
+# pip bash completion start
+_pip_completion()
+{
+    COMPREPLY=( $( COMP_WORDS="${COMP_WORDS[*]}" \
+                   COMP_CWORD=$COMP_CWORD \
+                   PIP_AUTO_COMPLETE=1 $1 ) )
 }
-
-mkcdir () {
-    mkdir -p -- "$1" &&
-      cd -P -- "$1"
-}
+complete -o default -F _pip_completion pip
+# pip bash completion end
 
 # TODO: Make this a script
 alias fig='docker-compose -f fig.yml'
 
-export EDITOR=$((subl --help >/dev/null 2>&1 && echo "subl -w") || (nano --help >/dev/null 2>&1 && echo nano))
+if type -p subl > /dev/null ; then
+    export EDITOR='subl -w'
+    export EDITOR_FILE="subl -w"
+    export EDITOR_DIR="subl -n"
+elif type -p nano > /dev/null ; then
+    export EDITOR=nano
+    export EDITOR_FILE=nano
+    export EDITOR_DIR=ls
+fi
+
+function e {
+    if [ "$1" = "" ] ; then
+        $EDITOR_DIR .
+    elif [ -d "$1" ] ; then
+        $EDITOR_DIR "$1"
+    else
+        $EDITOR_FILE "$1"
+    fi
+}
 
 source $DOTFILES/etc/bash/colors
 source $DOTFILES/etc/bash/prompt
+source $DOTFILES/etc/bash/functions
 
 PS1="\[$BIGreen\]$PROMPT_HOST:$PROMPT_USER\[$Green\][$PROMPT_TIME]\n\[$Blue\]$PROMPT_CURRENT_WORKING_DIR \[$Yellow\]$PROMPT_BRANCH\[$Color_Off\]$ "
 PS2='\[\033[01;36m\]>'
