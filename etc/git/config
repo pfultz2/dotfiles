@@ -30,6 +30,7 @@
     ls = ls-files
     lsm = ls-files -m
     lsd = ls-files -d
+    lso = ls-files -o
     lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
     forkdiff = !bash -c 'git diff $(git merge-base "$1" "$(git rev-parse --abbrev-ref HEAD)") "$(git rev-parse --abbrev-ref HEAD)" "${@: 3}" ' -
     forkdiff2 = !bash -c 'git diff $(git merge-base "$1" "$2") "$2" "${@: 3}" ' -

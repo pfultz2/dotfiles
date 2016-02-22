@@ -1,7 +1,7 @@
 
 export DOTFILES=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/../.. && pwd )
 
-export PATH="~/bin:$DOTFILES/bin:$PATH"
+export PATH="~/usr/bin:~/.local/bin:~/bin:$DOTFILES/bin:$PATH"
 
 if [ "$(uname)" == "Darwin" ]; then
     source $DOTFILES/etc/bash/mac
@@ -28,7 +28,7 @@ mkcdir () {
 # TODO: Make this a script
 alias fig='docker-compose -f fig.yml'
 
-export EDITOR="subl -w"
+export EDITOR=$((subl --help >/dev/null 2>&1 && echo "subl -w") || (nano --help >/dev/null 2>&1 && echo nano))
 
 source $DOTFILES/etc/bash/colors
 source $DOTFILES/etc/bash/prompt
