@@ -7,7 +7,7 @@ BWLIMITKBYTES=96000
 MAXSIZE=1024m
 DEST=`ssh $HOST 'echo $HOME/backup'`
 
-echo "rsync -avzx --partial --progress --delete --delete-excluded \
+echo "rsync-ignore-vanished-files -avzx --partial --progress --delete --delete-excluded \
 -e ssh \
 --exclude-from=\"$DOTFILES/etc/rsync/exclude\" \
 --link-dest=\"$DEST/$BACKUP/current\" \
@@ -23,7 +23,7 @@ echo "rsync -avzx --partial --progress --delete --delete-excluded \
 ssh $HOST \
 "mkdir -p $DEST/$BACKUP/incomplete_backup"
 
-rsync -avzx --partial --delete --progress --delete-excluded \
+rsync-ignore-vanished-files -avzx --partial --delete --progress --delete-excluded \
 -e ssh \
 --exclude-from="$DOTFILES/etc/rsync/exclude" \
 --link-dest="$DEST/$BACKUP/current" \
