@@ -3,14 +3,14 @@
 temp*
 */.Trash/*
 */.thumbnails/*
-*/.cache/mozilla/*
-*/.cache/chromium/*
+*/.cache/*
 */.local/share/Trash/*
 */.gvfs
+*/tmpindex/*
 /dev/*
 /proc/*
 /sys/*
-/tmp/*
+*/tmp/*
 /run/*
 /mnt/*
 /media/*
