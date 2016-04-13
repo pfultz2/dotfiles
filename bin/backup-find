@@ -1,0 +1,10 @@
+#!/bin/bash
+SOURCE=$HOME
+BACKUP=`hostname`
+HOST=backup
+
+SRC=`realpath $1`
+TOP_DIR=`dirname $SOURCE`
+DEST=`echo $SRC | sed -e "s,$TOP_DIR,,"`
+
+ssh $HOST "ls -1 ~/backup/$BACKUP | xargs -I{} ls -i ~/backup/$BACKUP/{}$DEST 2>/dev/null | sort -u -k 1,1 | cut -f 2 -d' '"
