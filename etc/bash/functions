@@ -2,6 +2,41 @@ function docker-use {
     eval "$(docker-machine env $1)"
 }
 
+# Setup paths
+pathremove() {
+  ABSPATH=`cd $1 && pwd`
+  if [ -d "$ABSPATH" ]; then
+    export PATH=${PATH//":$ABSPATH:"/} #delete all instances in the middle
+    export PATH=${PATH/%":$ABSPATH"/} #delete any instance at the end
+    export PATH=${PATH/#"$ABSPATH:"/} #delete any instance at the beginning
+  fi
+}
+
+pathprepend() {
+  ABSPATH=`cd $1 && pwd`
+  [ -d $ABSPATH ] || return
+  pathremove "$ABSPATH"
+  export PATH="$ABSPATH:$PATH"
+}
+
+pathappend() {
+  ABSPATH=`cd $1 && pwd`
+  [ -d "$ABSPATH" ] || return
+  pathremove "$ABSPATH"
+  export PATH="$PATH:$ABSPATH"
+}
+
+addpath() {
+  ABSPATH=`cd $1 && pwd`
+  pathremove "$ABSPATH"
+  export PATH="$ABSPATH:$PATH"
+}
+
+removepath() {
+  ABSPATH=`cd $1 && pwd`
+  pathremove "$ABSPATH"
+}
+
 tz(){
   tar cf - $1 | gzip > $(basename $1).tar.gz
 }
