@@ -48,7 +48,7 @@ alias fig='docker-compose -f fig.yml'
 
 alias vg='valgrind --track-origins=yes --read-var-info=yes --expensive-definedness-checks=yes --read-inline-info=yes'
 
-alias m="make -j${CPUCOUNT}"
+alias m="CTEST_PARALLEL_LEVEL=${CPUCOUNT} make -j${CPUCOUNT}"
 
 if type -p subl > /dev/null ; then
     export EDITOR='subl -w'
