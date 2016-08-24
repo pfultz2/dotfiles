@@ -6,6 +6,7 @@
 	"installed_packages":
 	[
 		"Ciapre Color Scheme",
+		"Clang Format",
 		"CMake",
 		"Increment Selection",
 		"Package Control",
