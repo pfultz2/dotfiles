@@ -26,4 +26,4 @@ else
 fi
 echo "Link sublime configuration"
 mkdir -p $SUBLIME_PACKAGE_DIR
-ln -s $DOTFILES/etc/git/sublime $SUBLIME_PACKAGE_DIR/User
+ln -s $DOTFILES/etc/sublime $SUBLIME_PACKAGE_DIR/User
