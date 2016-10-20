@@ -25,4 +25,5 @@ else
     export SUBLIME_PACKAGE_DIR=$HOME/.config/sublime-text-3/Packages
 fi
 echo "Link sublime configuration"
-ln -s $DOTFILES/etc/git/sublime $SUBLIME_PACKAGE_DIR/User
+mkdir -p $SUBLIME_PACKAGE_DIR
+ln -s $DOTFILES/etc/sublime $SUBLIME_PACKAGE_DIR/User
