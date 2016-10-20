@@ -46,7 +46,8 @@ complete -o default -F _pip_completion pip
 # TODO: Make this a script
 alias fig='docker-compose -f fig.yml'
 
-alias vg='valgrind --track-origins=yes --read-var-info=yes --expensive-definedness-checks=yes --read-inline-info=yes'
+# alias vg='valgrind --track-origins=yes --read-var-info=yes --expensive-definedness-checks=yes --read-inline-info=yes'
+alias vg='valgrind --track-origins=yes --read-var-info=yes --read-inline-info=yes'
 
 alias m="CTEST_PARALLEL_LEVEL=${CPUCOUNT} make -j${CPUCOUNT}"
 
