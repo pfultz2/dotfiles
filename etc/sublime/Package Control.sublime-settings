@@ -10,6 +10,7 @@
 		"Clang Format",
 		"CMake",
 		"Increment Selection",
+		"LLVM",
 		"Package Control",
 		"SelectUntil",
 		"ShellCommand",
