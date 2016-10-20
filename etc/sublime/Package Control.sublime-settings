@@ -5,11 +5,14 @@
 	],
 	"installed_packages":
 	[
+		"Case Conversion",
 		"Ciapre Color Scheme",
 		"Clang Format",
 		"CMake",
 		"Increment Selection",
 		"Package Control",
+		"SelectUntil",
+		"ShellCommand",
 		"SideBarEnhancements",
 		"SublimeLinter",
 		"SublimeLinter-contrib-cmakelint",
