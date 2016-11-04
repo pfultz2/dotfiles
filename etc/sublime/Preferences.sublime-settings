@@ -1,10 +1,10 @@
 {
-    "color_scheme": "Packages/User/SublimeLinter/Ciapre (SL).tmTheme",
-    "ignored_packages":
-    [
-        "Vintage"
-    ],
-    "translate_tabs_to_spaces": true,
-    "auto_complete_cycle": true,
-    "match_brackets_angle": true
+	"auto_complete_cycle": true,
+	"color_scheme": "Packages/User/SublimeLinter/Ciapre (SL).tmTheme",
+	"ignored_packages":
+	[
+		"Vintage"
+	],
+	"match_brackets_angle": true,
+	"translate_tabs_to_spaces": true
 }
