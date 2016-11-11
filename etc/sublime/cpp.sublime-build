@@ -1,0 +1,28 @@
+{
+    "shell_cmd": "make -j8 check",
+    "file_regex": "^(..[^:\n]*):([0-9]+):?([0-9]+)?:? (.*)$",
+    "working_dir": "${project_path:${folder}}/build",
+    "syntax": "Packages/User/BuildErrors.tmLanguage",
+    "variants": [
+        {
+            "name": "gcc 4.7",
+            "working_dir": "${project_path:${folder}}/build47"
+
+        },
+        {
+            "name": "gcc 4.8",
+            "working_dir": "${project_path:${folder}}/build48"
+
+        },
+        {
+            "name": "gcc 4.6",
+            "working_dir": "${project_path:${folder}}/build46"
+
+        },
+        {
+            "name": "clang",
+            "working_dir": "${project_path:${folder}}/clangbuild"
+
+        }
+    ]
+}
