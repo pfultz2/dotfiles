@@ -19,6 +19,7 @@
 		"SublimeLinter-contrib-cmakelint",
 		"SublimeLinter-cppcheck",
 		"SublimeLinter-pyflakes",
-		"SublimeLinter-pylint"
+		"SublimeLinter-pylint",
+		"Zeal"
 	]
 }

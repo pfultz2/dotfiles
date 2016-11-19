@@ -1,0 +1,6 @@
+{
+    "shell_cmd": "bash test.sh",
+    "file_regex": "^(..[^:\n]*):([0-9]+):?([0-9]+)?:? (.*)$",
+    "working_dir": "${project_path:${folder}}",
+    "syntax": "Packages/User/BuildErrorPanel.tmLanguage",
+}
