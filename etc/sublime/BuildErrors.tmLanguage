@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>fileTypes</key>
+	<array>
+		<string>cerr</string>
+	</array>
+	<key>name</key>
+	<string>C++ Error Output</string>
+	<key>patterns</key>
+	<array>
+		<dict>
+			<key>include</key>
+			<string>#quotes</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>\b(error)\b:</string>
+			<key>name</key>
+			<string>invalid.illegal</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>(warning|note):</string>
+			<key>name</key>
+			<string>markup.quote</string>
+		</dict>
+	</array>
+	<key>repository</key>
+	<dict>
+		<key>quotes</key>
+		<dict>
+			<key>begin</key>
+			<string>‘</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>keyword</string>
+				</dict>
+			</dict>
+			<key>end</key>
+			<string>’</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>keyword</string>
+				</dict>
+			</dict>
+			<key>name</key>
+			<string>quote</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>source.c++</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
+	<key>scopeName</key>
+	<string>source.cerr</string>
+	<key>uuid</key>
+	<string>45319b4d-90f8-4ff1-9a66-c56ed5c408a4</string>
+</dict>
+</plist>

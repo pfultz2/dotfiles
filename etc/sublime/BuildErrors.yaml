@@ -1,0 +1,100 @@
+# [PackageDev] target_format: plist, ext: tmLanguage
+---
+name: C++ Error Output
+scopeName: source.cerr
+fileTypes: [cerr]
+uuid: 45319b4d-90f8-4ff1-9a66-c56ed5c408a4
+
+patterns:
+# - include: '#pars'
+# - include: '#bracs'
+# - include: '#anglebracs'
+- include: '#quotes'
+# - include: '#curlies'
+- match: '\b(error)\b:'
+  name: invalid.illegal
+- match: '(warning|note):'
+  name: markup.quote
+# - match: ^[^\:\s]*(?=:)
+#   name: support.variable
+# - match: (?<=:)[0-9]+
+#   name: keyword.control
+
+repository:
+  quotes:
+    name: quote
+    begin: ‘
+    beginCaptures:
+      '0': {name: keyword}
+    end: ’
+    endCaptures:
+      '0': {name: keyword}
+    patterns:
+    - include: source.c++
+  # quotes:
+    # - match: ‘
+    #   push: Packages/C++.sublime-package
+    #   with_prototype:
+    #   - match: '(?=’)'
+    #     pop: true
+  # bracs:
+  #   name: markup.quote
+  #   begin: \[
+  #   beginCaptures:
+  #     '0': {name: keyword}
+  #   end: \]
+  #   endCaptures:
+  #     '0': {name: keyword}
+  #   patterns:
+  #   - include: $self
+  #   - include: anglebracs
+  #   - include: pars
+  # pars:
+  #   name: variable.parameter
+  #   begin: \(
+  #   beginCaptures:
+  #     '0': {name: keyword}
+  #   end: (\)|$)
+  #   endCaptures:
+  #     '0': {name: keyword}
+  #   patterns:
+  #   - include: $self
+  #   - include: anglebracs
+  # anglebracs:
+  #   name: markup.raw
+  #   begin: (?<!<)\<(?!\<)
+  #   beginCaptures:
+  #     '0': {name: keyword}
+  #   end: \>
+  #   endCaptures:
+  #     '0': {name: keyword}
+  #   patterns:
+  #   - include: $self
+  #   - include: pars
+  # quotes:
+  #   name: markup.heading
+  #   begin: ‘
+  #   beginCaptures:
+  #     '0': {name: keyword}
+  #   end: ’
+  #   endCaptures:
+  #     '0': {name: keyword}
+  #   patterns:
+  #   - include: $self
+  #   - include: anglebracs
+  #   - include: pars
+  #   - include: bracs
+  # curlies:
+  #   name: markup.list
+  #   begin: \{
+  #   beginCaptures:
+  #     '0': {name: keyword}
+  #   end: \}
+  #   endCaptures:
+  #     '0': {name: keyword}
+  #   patterns:
+  #   - include: $self
+  #   - include: anglebracs
+  #   - include: pars
+  #   - include: bracs
+...
