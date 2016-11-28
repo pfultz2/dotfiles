@@ -1,5 +1,5 @@
 #!/bin/bash
-date=`date "+%Y-%m-%dT%H_%M_%S"`
+date=`date "+%Y-%m-%d-%H_%M_%S"`
 SOURCE=$HOME
 BACKUP=`hostname -s`
 HOST=backup
