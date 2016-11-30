@@ -55,16 +55,18 @@ function cppcheck-all {
     cppcheck --enable=all --force --template "{file}({line}): {severity} ({id}): {message}" --suppress='noExplicitConstructor' `find -regex '.*/.*\.\(c\|cpp\|h\|hpp\|cl\)$'`
 }
 
-
 if type -p subl > /dev/null ; then
     export EDITOR='subl -w'
-    export EDITOR_FILE="subl -w"
+    export EDITOR_FILE="subl"
     export EDITOR_DIR="subl -n"
 elif type -p nano > /dev/null ; then
     export EDITOR=nano
     export EDITOR_FILE=nano
     export EDITOR_DIR=ls
 fi
+
+# Always use nano for crontab
+alias crontab='EDITOR=nano crontab'
 
 function e {
     if [ "$1" = "" ] ; then
