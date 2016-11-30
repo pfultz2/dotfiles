@@ -1,11 +1,19 @@
 #!/bin/bash
-date=`date "+%Y-%m-%dT%H_%M_%S"`
+date=`date "+%Y-%m-%d-%H_%M_%S"`
 SOURCE=$HOME
-BACKUP=`hostname`
+BACKUP=`hostname -s`
 HOST=backup
 BWLIMITKBYTES=96000
 MAXSIZE=1024m
 DEST=`ssh $HOST 'echo $HOME/backup'`
+
+if [ "$#" -eq 0 ]; then
+    COMMAND='backup'
+else
+    COMMAND=$1
+fi
+
+if [ "$COMMAND" == "backup" ]; then 
 
 echo "rsync-ignore-vanished-files -avzx --partial --progress --delete --delete-excluded \
 -e ssh \
@@ -35,3 +43,24 @@ rsync-ignore-vanished-files -avzx --partial --delete --progress --delete-exclude
 && rm -f $DEST/$BACKUP/current \
 && ln -s $DEST/$BACKUP/backup-$date $DEST/$BACKUP/current"
 # --log-file=$SOURCE/.rsync/backuplog \
+
+elif [ "$COMMAND" == "find" ]; then 
+    if [ "$#" -ne 2 ]; then
+        SRC=$(pwd)
+    else
+        SRC=$(realpath $2)
+    fi
+    # echo "Searching backup files for: $SRC"
+    TOP_DIR=$(dirname $SOURCE)
+    DEST=$(echo $SRC | sed -e "s,$TOP_DIR,,")
+    # echo "Searching backup files in: $DEST"
+
+    if [ -d "${SRC}" ] ; then
+        comm -23 <(ssh $HOST "find ~/backup/$BACKUP/backup-*$DEST -maxdepth 1 -type f -print0 | xargs -0 -n1 basename | sort -u") <(ls -1 $SRC | sort)
+    else
+        ssh $HOST "ls -1 ~/backup/$BACKUP | xargs -I{} ls -i ~/backup/$BACKUP/{}$DEST 2>/dev/null | sort -u -k 1,1 | cut -f 2 -d' '"
+    fi
+# ls -1 | grep -v "backup-$(date --date='week ago' '+%Y-%m')" | sort -r | awk -F"-" '_[$2+$3]++'
+else
+    echo "Command $COMMAND not found"
+fi

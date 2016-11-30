@@ -9,6 +9,8 @@ alias l='ls -CF'
 
 export PATH="$PATH:/Applications/Sublime Text.app/Contents/SharedSupport/bin"
 
+alias firefox='open -a firefox'
+
 # alias dumpclip='xclip -selection clipboard -o'
 # alias pushclip='xclip -selection clipboard'
 
