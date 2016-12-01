@@ -1,4 +1,5 @@
 
+# echo "${BASH_SOURCE[0]}"
 export DOTFILES=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/../.. && pwd )
 
 export PATH="~/usr/bin:~/.local/bin:~/bin:$DOTFILES/bin:/usr/local/bin:$PATH"
@@ -50,6 +51,12 @@ alias fig='docker-compose -f fig.yml'
 alias vg='valgrind --track-origins=yes --read-var-info=yes --read-inline-info=yes'
 
 alias m="CTEST_PARALLEL_LEVEL=${CPUCOUNT} make -j${CPUCOUNT}"
+
+# Pretty print the path
+alias path='echo $PATH | tr -s ":" "\n"'
+
+# URL-encode strings
+alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.argv[1]);"'
 
 function cppcheck-all {
     cppcheck --enable=all --force --template "{file}({line}): {severity} ({id}): {message}" --suppress='noExplicitConstructor' `find -regex '.*/.*\.\(c\|cpp\|h\|hpp\|cl\)$'`
