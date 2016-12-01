@@ -44,6 +44,8 @@ rsync-ignore-vanished-files -avzx --partial --delete --progress --delete-exclude
 && ln -s $DEST/$BACKUP/backup-$date $DEST/$BACKUP/current"
 # --log-file=$SOURCE/.rsync/backuplog \
 
+elif [ "$COMMAND" == "ls" ]; then 
+    ssh backup "ls -1 $DEST/$BACKUP"
 elif [ "$COMMAND" == "find" ]; then 
     if [ "$#" -ne 2 ]; then
         SRC=$(pwd)
