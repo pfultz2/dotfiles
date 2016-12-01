@@ -107,6 +107,10 @@ function sshkey {
   echo "sshkey done."
 }
 
+function tohex {
+  printf "%x\n" "$@"
+}
+
 
 # find shorthand
 function f() {
