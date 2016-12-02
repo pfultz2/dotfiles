@@ -1,4 +1,5 @@
 
+# echo "${BASH_SOURCE[0]}"
 export DOTFILES=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/../.. && pwd )
 
 export PATH="~/usr/bin:~/.local/bin:~/bin:$DOTFILES/bin:/usr/local/bin:$PATH"
@@ -51,20 +52,28 @@ alias vg='valgrind --track-origins=yes --read-var-info=yes --read-inline-info=ye
 
 alias m="CTEST_PARALLEL_LEVEL=${CPUCOUNT} make -j${CPUCOUNT}"
 
+# Pretty print the path
+alias path='echo $PATH | tr -s ":" "\n"'
+
+# URL-encode strings
+alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.argv[1]);"'
+
 function cppcheck-all {
     cppcheck --enable=all --force --template "{file}({line}): {severity} ({id}): {message}" --suppress='noExplicitConstructor' `find -regex '.*/.*\.\(c\|cpp\|h\|hpp\|cl\)$'`
 }
 
-
 if type -p subl > /dev/null ; then
     export EDITOR='subl -w'
-    export EDITOR_FILE="subl -w"
+    export EDITOR_FILE="subl"
     export EDITOR_DIR="subl -n"
 elif type -p nano > /dev/null ; then
     export EDITOR=nano
     export EDITOR_FILE=nano
     export EDITOR_DIR=ls
 fi
+
+# Always use nano for crontab
+alias crontab='EDITOR=nano crontab'
 
 function e {
     if [ "$1" = "" ] ; then

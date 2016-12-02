@@ -97,3 +97,39 @@ function cdup() {
     cd $ups
 }
 
+function pwf {
+  echo "$PWD/$1"
+}
+
+# SSH to the given machine and add your id_rsa.pub or id_dsa.pub to authorized_keys.
+function sshkey {
+  ssh $1 "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys" < ~/.ssh/id_?sa.pub  # '?sa' is a glob, not a typo!
+  echo "sshkey done."
+}
+
+function tohex {
+  printf "%x\n" "$@"
+}
+
+
+# find shorthand
+function f() {
+  find . -name "$1" 2>&1 | grep -v 'Permission denied'
+}
+
+# Intuitive map function
+# For example, to list all directories that contain a certain file:
+# find . -name .gitattributes | map dirname
+function map() {
+  xargs -n1 "$@"
+}
+
+
+# Use Git’s colored diff when available
+hash git &>/dev/null;
+if [ $? -eq 0 ]; then
+  function diff() {
+    git diff --no-index --color-words "$@";
+  }
+fi
+

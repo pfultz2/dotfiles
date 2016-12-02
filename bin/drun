@@ -2,4 +2,7 @@
 
 CURRENT_DIR=${CURRENT_DIR:-`pwd`}
 DATA_DIR=${DATA_DIR:-/data}
-docker run -it -v="$CURRENT_DIR:$DATA_DIR" -w /data $@
+# DOCKER_HOME=$(docker run $1 sh -c 'echo $HOME')
+# DOCKER_USER=$(id -u)
+# -v="$HOME/.ssh:$DOCKER_HOME/.ssh:ro"
+docker run -it -v="$CURRENT_DIR:$DATA_DIR" -v="/etc/localtime:/etc/localtime" --device="/dev/kfd" -w /data $@
