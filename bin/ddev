@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# This sets up a development docker container using ubuntu-based images. To
+# build a container named `dev` using ubuntu 16.04, just run:
+#
+#     ddev ubuntu:16.04 dev
+#
+
+export docker_base=$1
+cat $DOTFILES/docker/dev.docker | envsubst '${docker_base}' | docker build -t $2 -
