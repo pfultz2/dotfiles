@@ -86,8 +86,8 @@ function e {
 }
 
 source $DOTFILES/etc/bash/colors
-source $DOTFILES/etc/bash/prompt
 source $DOTFILES/etc/bash/functions
 
-PS1="\[$BIGreen\]$PROMPT_HOST:$PROMPT_USER\[$Green\][$PROMPT_TIME]\n\[$Blue\]$PROMPT_CURRENT_WORKING_DIR \[$Yellow\]$PROMPT_BRANCH\[$Color_Off\]$ "
-PS2='\[\033[01;36m\]>'
+[[ $- == *i* ]] && source $DOTFILES/etc/bash/prompt
+[[ $- == *i* ]] && PS1="\[$BIGreen\]$PROMPT_HOST:$PROMPT_USER\[$Green\][$PROMPT_TIME]\n\[$Blue\]$PROMPT_CURRENT_WORKING_DIR \[$Yellow\]$PROMPT_BRANCH\[$Color_Off\]$ "
+[[ $- == *i* ]] && PS2='\[\033[01;36m\]>'

@@ -2,7 +2,18 @@
 
 CURRENT_DIR=${CURRENT_DIR:-`pwd`}
 DATA_DIR=${DATA_DIR:-/data}
+DOCKER_OPTIONS=(-v="$CURRENT_DIR:$DATA_DIR" -w /data)
+if [ -f /etc/localtime ]; then
+    DOCKER_OPTIONS+=(-v='/etc/localtime:/etc/localtime')
+fi
+
+if [ -f /dev/kfd ]; then
+    DOCKER_OPTIONS+=(--device='/dev/kfd')
+fi
+
 # DOCKER_HOME=$(docker run $1 sh -c 'echo $HOME')
 # DOCKER_USER=$(id -u)
 # -v="$HOME/.ssh:$DOCKER_HOME/.ssh:ro"
-docker run -it -v="$CURRENT_DIR:$DATA_DIR" -v="/etc/localtime:/etc/localtime" --device="/dev/kfd" -w /data $@
+echo "docker run -it ${DOCKER_OPTIONS[@]} $@"
+docker run -it ${DOCKER_OPTIONS[@]} $@
+
