@@ -7,9 +7,7 @@ if [ -f /etc/localtime ]; then
     DOCKER_OPTIONS+=(-v='/etc/localtime:/etc/localtime')
 fi
 
-if [ -f /dev/kfd ]; then
-    DOCKER_OPTIONS+=(--device='/dev/kfd')
-fi
+ls /dev/kfd && DOCKER_OPTIONS+=(--device='/dev/kfd')
 
 # DOCKER_HOME=$(docker run $1 sh -c 'echo $HOME')
 # DOCKER_USER=$(id -u)
