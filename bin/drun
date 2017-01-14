@@ -2,12 +2,26 @@
 
 CURRENT_DIR=${CURRENT_DIR:-`pwd`}
 DATA_DIR=${DATA_DIR:-/data}
-DOCKER_OPTIONS=(-v="$CURRENT_DIR:$DATA_DIR" -w /data)
+DOCKER_OPTIONS=(-v="$CURRENT_DIR:$DATA_DIR" -w /data --network 'host' --userns 'host')
 if [ -f /etc/localtime ]; then
     DOCKER_OPTIONS+=(-v='/etc/localtime:/etc/localtime')
 fi
 
 ls /dev/kfd && DOCKER_OPTIONS+=(--device='/dev/kfd')
+
+# DNS_SERVERS=$((nmcli dev list || nmcli dev show) 2> /dev/null | grep DNS | sed 's/\s\s*/\t/g' | cut -f 2)
+
+# for SERVER in $DNS_SERVERS; do
+#     DOCKER_OPTIONS+=(--dns $SERVER)
+# done
+
+# TODO: use --add-host to add hosts from /etc/hosts
+
+# DOCKER_OPTIONS+=(-u $(id -u):$(id -g) -v="$HOME/.ssh:$HOME/.ssh:ro")
+
+USERNAME=$(id -nu)
+DOCKER_HOME=/home/$USERNAME
+DOCKER_OPTIONS+=(-v="$HOME/.ssh:$DOCKER_HOME/.ssh:ro")
 
 # DOCKER_HOME=$(docker run $1 sh -c 'echo $HOME')
 # DOCKER_USER=$(id -u)
