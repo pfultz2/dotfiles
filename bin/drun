@@ -1,19 +1,23 @@
 #!/bin/bash
 
+DOCKER_MINOR_VERSION=$(docker --version | sed "s/.*Docker version \([^ ]*\).*$/\1/" | cut -f 2 -d.)
 CURRENT_DIR=${CURRENT_DIR:-`pwd`}
 DATA_DIR=${DATA_DIR:-/data}
-DOCKER_OPTIONS=(-v="$CURRENT_DIR:$DATA_DIR" -w /data --network 'host' --userns 'host')
+DOCKER_OPTIONS=(-v="$CURRENT_DIR:$DATA_DIR" -w /data)
 if [ -f /etc/localtime ]; then
     DOCKER_OPTIONS+=(-v='/etc/localtime:/etc/localtime')
 fi
 
 ls /dev/kfd && DOCKER_OPTIONS+=(--device='/dev/kfd')
 
-# DNS_SERVERS=$((nmcli dev list || nmcli dev show) 2> /dev/null | grep DNS | sed 's/\s\s*/\t/g' | cut -f 2)
-
-# for SERVER in $DNS_SERVERS; do
-#     DOCKER_OPTIONS+=(--dns $SERVER)
-# done
+if [ "$DOCKER_MINOR_VERSION" -lt "11" ]; then
+    DNS_SERVERS=$((nmcli dev list || nmcli dev show) 2> /dev/null | grep DNS | sed 's/\s\s*/\t/g' | cut -f 2)
+    for SERVER in $DNS_SERVERS; do
+        DOCKER_OPTIONS+=(--dns $SERVER)
+    done
+else
+    DOCKER_OPTIONS=(--network 'host' --userns 'host')
+fi
 
 # TODO: use --add-host to add hosts from /etc/hosts
 
