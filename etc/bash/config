@@ -4,6 +4,8 @@ export DOTFILES=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/../.. && pwd )
 
 export PATH="~/usr/bin:~/.local/bin:~/bin:$DOTFILES/bin:/usr/local/bin:$PATH"
 
+export CMAKE_PREFIX_PATH="$HOME/usr/"
+
 # OS variables
 [ $(uname -s) = "Darwin" ] && export OSX=1 && export UNIX=1
 [ $(uname -s) = "Linux" ] && export LINUX=1 && export UNIX=1
@@ -44,7 +46,7 @@ _pip_completion()
 complete -o default -F _pip_completion pip
 # pip bash completion end
 
-alias cpm='cget -p /usr/local'
+alias cpm='cget -p ~/usr'
 
 # TODO: Make this a script
 alias fig='docker-compose -f fig.yml'

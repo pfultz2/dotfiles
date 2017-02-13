@@ -2,6 +2,7 @@ FROM ${docker_base}
 
 RUN apt-get update
 RUN apt-get install -y \
+    bash-completion \
     build-essential \
     bc \
     clang-format-3.8 \
