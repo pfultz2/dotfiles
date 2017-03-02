@@ -15,37 +15,37 @@ fi
 
 if [ "$COMMAND" == "backup" ]; then 
 
-echo "rsync-ignore-vanished-files -avzx --partial --progress --delete --delete-excluded \
--e ssh \
---exclude-from=\"$DOTFILES/etc/rsync/exclude\" \
---link-dest=\"$DEST/$BACKUP/current\" \
---bwlimit=$BWLIMITKBYTES \
---max-size=$MAXSIZE \
---log-file=$SOURCE/.rsync/backuplog \
-\"$SOURCE\" $HOST:$DEST/$BACKUP/incomplete_backup \
-&& ssh $HOST \
-\"mv $DEST/$BACKUP/incomplete_backup $DEST/$BACKUP/backup-$date \
-&& rm -f $DEST/$BACKUP/current \
-&& ln -s $DEST/$BACKUP/backup-$date $DEST/$BACKUP/current\""
+    echo "rsync-ignore-vanished-files -avzx --partial --progress --delete --delete-excluded \
+    -e ssh \
+    --exclude-from=\"$DOTFILES/etc/rsync/exclude\" \
+    --link-dest=\"$DEST/$BACKUP/current\" \
+    --bwlimit=$BWLIMITKBYTES \
+    --max-size=$MAXSIZE \
+    --log-file=$SOURCE/.rsync/backuplog \
+    \"$SOURCE\" $HOST:$DEST/$BACKUP/incomplete_backup \
+    && ssh $HOST \
+    \"mv $DEST/$BACKUP/incomplete_backup $DEST/$BACKUP/backup-$date \
+    && rm -f $DEST/$BACKUP/current \
+    && ln -s $DEST/$BACKUP/backup-$date $DEST/$BACKUP/current\""
 
-ssh $HOST \
-"mkdir -p $DEST/$BACKUP/incomplete_backup"
+    ssh $HOST \
+    "mkdir -p $DEST/$BACKUP/incomplete_backup"
 
-rsync-ignore-vanished-files -avzx --partial --delete --progress --delete-excluded \
--e ssh \
---exclude-from="$DOTFILES/etc/rsync/exclude" \
---link-dest="$DEST/$BACKUP/current" \
---bwlimit=$BWLIMITKBYTES \
---max-size=$MAXSIZE \
-"$SOURCE" $HOST:$DEST/$BACKUP/incomplete_backup \
-&& ssh $HOST \
-"mv $DEST/$BACKUP/incomplete_backup $DEST/$BACKUP/backup-$date \
-&& rm -f $DEST/$BACKUP/current \
-&& ln -s $DEST/$BACKUP/backup-$date $DEST/$BACKUP/current"
-# --log-file=$SOURCE/.rsync/backuplog \
+    rsync-ignore-vanished-files -avzx --partial --delete --progress --delete-excluded \
+    -e ssh \
+    --exclude-from="$DOTFILES/etc/rsync/exclude" \
+    --link-dest="$DEST/$BACKUP/current" \
+    --bwlimit=$BWLIMITKBYTES \
+    --max-size=$MAXSIZE \
+    "$SOURCE" $HOST:$DEST/$BACKUP/incomplete_backup \
+    && ssh $HOST \
+    "mv $DEST/$BACKUP/incomplete_backup $DEST/$BACKUP/backup-$date \
+    && rm -f $DEST/$BACKUP/current \
+    && ln -s $DEST/$BACKUP/backup-$date $DEST/$BACKUP/current"
+    # --log-file=$SOURCE/.rsync/backuplog \
 
 elif [ "$COMMAND" == "ls" ]; then 
-    ssh backup "ls -1 $DEST/$BACKUP"
+    ssh $HOST "ls -1 $DEST/$BACKUP"
 elif [ "$COMMAND" == "find" ]; then 
     if [ "$#" -ne 2 ]; then
         SRC=$(pwd)
@@ -62,7 +62,14 @@ elif [ "$COMMAND" == "find" ]; then
     else
         ssh $HOST "ls -1 ~/backup/$BACKUP | xargs -I{} ls -i ~/backup/$BACKUP/{}$DEST 2>/dev/null | sort -u -k 1,1 | cut -f 2 -d' '"
     fi
-# ls -1 | grep -v "backup-$(date --date='week ago' '+%Y-%m')" | sort -r | awk -F"-" '_[$2+$3]++'
+elif [ "$COMMAND" == "clean" ]; then 
+    DATE=$((gdate > /dev/null && echo "gdate") || echo "date")
+    WEEK_AGO=$($DATE --date='week ago' '+%Y-%m-%d')
+    BACKUPS=$(ssh $HOST "ls -1 $DEST/$BACKUP"  | sort | awk '/backup-$WEEK_AGO/ {exit} {print}' | sort -r | tail -n +10 | awk -F'-' '_[$2+$3+$4]++')
+    for BACKUP_DIR in $BACKUPS; do
+        echo "Removing: $BACKUP_DIR"
+        ssh $HOST "mkdir -p $DEST/$BACKUP/trash && mv $DEST/$BACKUP/$BACKUP_DIR $DEST/$BACKUP/trash/"
+    done
 else
     echo "Command $COMMAND not found"
 fi

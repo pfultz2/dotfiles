@@ -1,4 +1,6 @@
 #!/bin/bash
 
-curl -s $1 | md5sum | awk '{print $1}'
+MD5=$((md5sum &> /dev/null && echo "md5sum") || echo "md5")
+
+curl -L $1 | $MD5 | awk '{print $1}'
 
