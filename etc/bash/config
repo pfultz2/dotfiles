@@ -66,7 +66,7 @@ function cppcheck-all {
     cppcheck --enable=all --force --template "{file}({line}): {severity} ({id}): {message}" --suppress='noExplicitConstructor' $(find -regex '.*/.*\.\(c\|cpp\|h\|hpp\|cl\)$')
 }
 
-if type -p subl > /dev/null && xhost >& /dev/null ; then
+if type -p subl > /dev/null && [[ ! -z "$DISPLAY" ]] ; then
     export EDITOR='subl -w'
     export EDITOR_FILE="subl"
     export EDITOR_DIR="subl -n"
