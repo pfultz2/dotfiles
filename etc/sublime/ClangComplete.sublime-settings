@@ -1,13 +1,30 @@
 {
+    "debug": false,
     "exclude_options": ["-W*unused-but-set-variable", "-W*maybe-uninitialized", "-W*logical-op", "-w"],
+    "build_dir": ["clangbuild", "build"],
     "default_include_paths":
     [
         "/usr/include/c++/4.8",
         "/usr/include/x86_64-linux-gnu/c++/4.8",
         "/usr/include/c++/4.8/backward",
         "/usr/lib/gcc/x86_64-linux-gnu/4.8/include",
-        "/usr/local/include",
         "/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed",
+        "/usr/include/c++/4.9",
+        "/usr/include/x86_64-linux-gnu/c++/4.9",
+        "/usr/include/c++/4.9/backward",
+        "/usr/lib/gcc/x86_64-linux-gnu/4.9/include",
+        "/usr/lib/gcc/x86_64-linux-gnu/4.9/include-fixed",
+        "/usr/include/c++/5",
+        "/usr/include/x86_64-linux-gnu/c++/5",
+        "/usr/include/c++/5/backward",
+        "/usr/lib/gcc/x86_64-linux-gnu/5/include",
+        "/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed",
+        "/usr/include/c++/6",
+        "/usr/include/x86_64-linux-gnu/c++/6",
+        "/usr/include/c++/6/backward",
+        "/usr/lib/gcc/x86_64-linux-gnu/6/include",
+        "/usr/lib/gcc/x86_64-linux-gnu/6/include-fixed",
+        "/usr/local/include",
         "/usr/include/x86_64-linux-gnu",
         "/usr/include"
     ]
