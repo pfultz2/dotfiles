@@ -1,5 +1,5 @@
 {
-    "debug": false,
+    "debug": true,
     "exclude_options": ["-W*unused-but-set-variable", "-W*maybe-uninitialized", "-W*logical-op", "-w"],
     "build_dir": ["clangbuild", "build"],
     "default_include_paths":
