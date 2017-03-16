@@ -26,7 +26,7 @@ fi
 USERNAME=$(id -nu)
 DOCKER_HOME=/home/$USERNAME
 DOCKER_OPTIONS+=(-v="$HOME/.ssh:$DOCKER_HOME/.ssh:ro")
-
+DOCKER_OPTIONS+=(--cap-add SYS_PTRACE)
 # DOCKER_HOME=$(docker run $1 sh -c 'echo $HOME')
 # DOCKER_USER=$(id -u)
 # -v="$HOME/.ssh:$DOCKER_HOME/.ssh:ro"
