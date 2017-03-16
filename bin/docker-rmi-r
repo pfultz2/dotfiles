@@ -1,0 +1,4 @@
+#!/bin/bash
+
+docker rmi $(docker inspect --format='{{.Id}} {{.Parent}}' $(docker images --filter since=$1 -q))
+docker rmi $1
