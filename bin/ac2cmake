@@ -1,0 +1,58 @@
+#!/bin/bash
+
+autoconf -t 'AC_INIT:ac_init("$1" $2)' \
+-t 'AC_CHECK_HEADER:ac_check_headers($1)' \
+-t 'AC_CHECK_HEADERS:ac_check_headers($1)' \
+-t 'AC_CHECK_HEADERS_ONCE:ac_check_headers($1)' \
+-t 'AC_CHECK_SIZEOF:ac_check_sizeof($1)' \
+-t 'AC_CHECK_FUNCS:ac_check_funcs($1)' \
+-t 'AC_CHECK_FUNCS_ONCE:ac_check_funcs($1)' \
+-t 'AC_REPLACE_FUNCS:ac_replace_funcs("" $1)' \
+-t 'AC_LIBOBJ:ac_libobj($1)' \
+-t 'AC_CHECK_TYPE:ac_check_type($1 "$4")' \
+-t 'AC_CHECK_TYPES:ac_check_types("$4" $1)' \
+-t 'AC_CHECK_DECL:ac_check_decl($1 "$4")' \
+-t 'AC_CHECK_DECLS:ac_check_decls("$4" $1)' \
+-t 'AC_CHECK_DECLS_ONCE:ac_check_decls("" $1)' \
+-t 'AC_CHECK_MEMBER:ac_check_member("$1" "$4")' \
+-t 'AC_CHECK_MEMBERS:ac_check_members("$1" "$4")' \
+-t 'AC_C_BIGENDIAN:ac_c_bigendian()' \
+-t 'AC_C_INLINE:ac_c_inline()' \
+-t 'AC_HEADER_DIRENT:ac_header_dirent()' \
+-t 'AC_HEADER_RESOLV:ac_header_resolv()' \
+-t 'AC_HEADER_STDBOOL:ac_header_stdbool()' \
+-t 'AC_HEADER_STDC:ac_header_stdc()' \
+-t 'AC_HEADER_TIME:ac_header_time()' \
+-t 'AC_SYS_LARGEFILE:ac_sys_largefile()' \
+-t 'AC_TYPE_OFF_T:ac_type_off_t()' \
+-t 'AC_TYPE_SIZE_T:ac_type_size_t()' \
+| grep -v '\$' | sed -e 's/\[//g' -e 's/]//g'
+
+autoconf -t 'AC_SEARCH_LIBS:ac_search_libs("$3" $1 $2)' | m4 - -DAC_DEFINE='$1' \
+| grep -v '\$' | grep -v '=' | sed -e 's/\[//g' -e 's/]//g'
+
+autoconf -t 'AC_CHECK_LIB:ac_check_lib("$3" $1 $2)' | m4 - -DAC_DEFINE='$1' \
+| grep -v '\$' | grep -v '=' | sed -e 's/\[//g' -e 's/]//g'
+
+echo "ac_includes_default_list()"
+autoconf -t 'AC_DEFUN:AC_DEFUN $1<newline>$2' | \
+m4 - \
+    -DAC_DEFINE='<newline><define> $1<newline>' \
+    -DAC_DEFINE_UNQUOTED='<newline><define> $1<newline>' \
+    -DAC_LANG_PROGRAM='$1<newline>int main() { $2 }' \
+    -DAC_LANG_SOURCE='$1<newline>int main() {}' \
+    -DAC_CACHE_CHECK='$3' \
+    -DAC_COMPILE_IFELSE='<newline><start_capture><newline>ac_source_compiles("<newline>$1<newline>"<newline><end_capture>' \
+    -DAC_RUN_IFELSE='<newline><start_capture><newline>ac_source_runs("<newline>$1<newline>"<newline><end_capture>' \
+| \
+gsed 's/<newline>/\n/g' | \
+gawk \
+-e 'BEGIN { capture = 0 }' \
+-e '/<define>/ { fun_defines[current_fun] = $2 }' \
+-e '/<start_capture>/ { capture = 1 }' \
+-e '/<end_capture>/ { capture = 0 }' \
+-e '/AC_DEFUN/ { current_fun = $2 }' \
+-e '$1 != "<start_capture>" { gsub(/^[ \t\r\n\v\f]+/,"",$0); if (capture == 1 && length($0) > 0) { funs[current_fun] = funs[current_fun] "\n" $0 }}' \
+-e 'END { for(fun in fun_defines) { if (length(funs[fun]) > 1) { print funs[fun] " " fun_defines[fun] ")" }}}' \
+
+autoconf -t 'AC_CONFIG_FILES:ac_config_file($1)' | grep -v '\$'

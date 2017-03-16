@@ -1,0 +1,13 @@
+#!/bin/bash
+
+i=$(ps ax | grep bash | grep brew | wc -l)
+echo $i
+
+while [ $i -ne 0 ]
+do
+ps ax | grep bash | grep brew | awk '{ print $1 }' | xargs kill
+i=$(ps ax | grep bash | grep brew | wc -l)
+done
+echo $i
+# ps ax | grep bash | grep brew | awk '{ print $1 }' | xargs kill
+# ps ax | grep bash | grep brew | wc -l
