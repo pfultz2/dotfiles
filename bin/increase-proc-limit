@@ -1,0 +1,5 @@
+#!/bin/bash
+
+sysctl -a | grep maxproc
+sysctl -w kern.maxproc=$1
+sysctl -w kern.maxprocperuid=$(echo "$1 - 710" | bc)
