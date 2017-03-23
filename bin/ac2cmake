@@ -1,10 +1,14 @@
 #!/bin/bash
 
+SED=$((gsed &> /dev/null && echo "gsed") || echo "sed")
+AWK=$((gawk &> /dev/null && echo "gawk") || echo "awk")
+
 autoconf -t 'AC_INIT:ac_init("$1" $2)' \
 -t 'AC_CHECK_HEADER:ac_check_headers($1)' \
 -t 'AC_CHECK_HEADERS:ac_check_headers($1)' \
 -t 'AC_CHECK_HEADERS_ONCE:ac_check_headers($1)' \
 -t 'AC_CHECK_SIZEOF:ac_check_sizeof($1)' \
+-t 'AC_CHECK_FUNC:ac_check_funcs($1)' \
 -t 'AC_CHECK_FUNCS:ac_check_funcs($1)' \
 -t 'AC_CHECK_FUNCS_ONCE:ac_check_funcs($1)' \
 -t 'AC_REPLACE_FUNCS:ac_replace_funcs("" $1)' \
@@ -45,8 +49,8 @@ m4 - \
     -DAC_COMPILE_IFELSE='<newline><start_capture><newline>ac_source_compiles("<newline>$1<newline>"<newline><end_capture>' \
     -DAC_RUN_IFELSE='<newline><start_capture><newline>ac_source_runs("<newline>$1<newline>"<newline><end_capture>' \
 | \
-gsed 's/<newline>/\n/g' | \
-gawk \
+$SED 's/<newline>/\n/g' | \
+$AWK \
 -e 'BEGIN { capture = 0 }' \
 -e '/<define>/ { fun_defines[current_fun] = $2 }' \
 -e '/<start_capture>/ { capture = 1 }' \

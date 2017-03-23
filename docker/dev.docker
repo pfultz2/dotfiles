@@ -13,6 +13,7 @@ RUN apt-get install -y \
     gettext \
     git \
     iputils-ping \
+    liblzma-dev \
     ltrace \
     lzma \
     make \
@@ -29,7 +30,7 @@ RUN apt-get install -y \
     xclip \
     zip
 
-RUN pip install cget
+RUN pip install cget backports.lzma
 RUN mkdir -p /data
 
 RUN addgroup --gid ${group_id} ${username}
