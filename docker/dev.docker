@@ -24,6 +24,7 @@ RUN apt-get install -y \
     software-properties-common \
     strace \
     subversion \
+    sudo \
     time \
     valgrind \
     wget \
@@ -35,6 +36,8 @@ RUN mkdir -p /data
 
 RUN addgroup --gid ${group_id} ${username}
 RUN useradd --create-home --shell /bin/bash -u ${user_id} --gid ${group_id} ${username}
+RUN usermod -aG sudo ${username}
+RUN echo "ALL            ALL = (ALL) NOPASSWD: ALL" >> /etc/sudoers
 USER ${username}
 
 RUN git clone https://github.com/pfultz2/dotfiles.git /home/${username}/dotfiles

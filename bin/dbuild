@@ -1,0 +1,14 @@
+#!/bin/bash
+
+CONTAINER=$1
+shift 1
+BUILD_ARGS=()
+for var in "$@"
+do
+    BUILD_ARGS+=(--build-arg $var)
+done
+echo "docker build -t ${CONTAINER} ${BUILD_ARGS[@]} ."
+docker build -t ${CONTAINER} ${BUILD_ARGS[@]} .
+echo "ddev ${CONTAINER} ${CONTAINER}-dev"
+ddev ${CONTAINER} ${CONTAINER}-dev
+
