@@ -1,6 +1,14 @@
 {
 	"auto_complete_cycle": true,
 	"color_scheme": "Packages/User/SublimeLinter/Ciapre (SL).tmTheme",
+	"folder_exclude_patterns":
+	[
+		".svn",
+		".git",
+		".hg",
+		"CVS",
+		".tox"
+	],
 	"ignored_packages":
 	[
 		"Vintage"

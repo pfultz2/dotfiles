@@ -3,12 +3,23 @@
 CONTAINER=$1
 shift 1
 BUILD_ARGS=()
-for var in "$@"
+while (( "$#" ))
 do
-    BUILD_ARGS+=(--build-arg $var)
+    arg="$1"
+    case "$arg" in
+    -f)
+        shift
+        BUILD_ARGS+=(-f $1)
+        ;;
+    *)
+        BUILD_ARGS+=(--build-arg $1)
+        ;;
+    esac
+    shift
 done
+
 echo "docker build -t ${CONTAINER} ${BUILD_ARGS[@]} ."
-docker build -t ${CONTAINER} ${BUILD_ARGS[@]} .
-echo "ddev ${CONTAINER} ${CONTAINER}-dev"
+docker build -t ${CONTAINER} ${BUILD_ARGS[@]} . && \
+echo "ddev ${CONTAINER} ${CONTAINER}-dev" && \
 ddev ${CONTAINER} ${CONTAINER}-dev
 
