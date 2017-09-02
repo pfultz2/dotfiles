@@ -2,6 +2,7 @@
     "debug": true,
     "exclude_options": ["-W*unused-but-set-variable", "-W*maybe-uninitialized", "-W*logical-op", "-w"],
     "build_dir": ["clangbuild", "build"],
+    "show_diagnostics_on_save": "always",
     "default_include_paths":
     [
         "/usr/include/c++/4.8",

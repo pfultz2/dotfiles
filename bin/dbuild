@@ -11,6 +11,9 @@ do
         shift
         BUILD_ARGS+=(-f $1)
         ;;
+    --*)
+        BUILD_ARGS+=($1)
+        ;;
     *)
         BUILD_ARGS+=(--build-arg $1)
         ;;
