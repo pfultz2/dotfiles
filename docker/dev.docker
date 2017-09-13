@@ -43,6 +43,6 @@ USER ${username}
 RUN git clone https://github.com/pfultz2/dotfiles.git /home/${username}/dotfiles
 RUN /home/${username}/dotfiles/setup/bootstrap.sh
 
-RUN ls /root/.wine/ && cp -r /root/.wine ~/
+RUN ls /root/.wine/ && cp -r /root/.wine ~/ || echo "Skip wine"
 
 WORKDIR /data

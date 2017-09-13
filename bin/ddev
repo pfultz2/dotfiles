@@ -10,4 +10,5 @@ export docker_base=$1
 export user_id=$(id -u)
 export group_id=$(id -g)
 export username=$(id -nu)
+echo "docker build -t $2"
 cat $DOTFILES/docker/dev.docker | envsubst | docker build -t $2 -

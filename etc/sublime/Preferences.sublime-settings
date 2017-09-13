@@ -14,5 +14,6 @@
 		"Vintage"
 	],
 	"match_brackets_angle": true,
+	"theme": "Adaptive.sublime-theme",
 	"translate_tabs_to_spaces": true
 }
