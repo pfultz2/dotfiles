@@ -21,6 +21,7 @@ RUN apt-get install -y \
     python-dev \
     python-pip \
     python-software-properties \
+    ssh \
     software-properties-common \
     strace \
     subversion \
