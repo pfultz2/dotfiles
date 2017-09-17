@@ -8,6 +8,13 @@ if [ -f /etc/localtime ]; then
     DOCKER_OPTIONS+=(-v='/etc/localtime:/etc/localtime')
 fi
 
+if [ -d /tmp/.X11-unix ]; then
+    for SOCK in $(ls -1 /tmp/.X11-unix/);
+    do
+        DOCKER_OPTIONS+=(-v="/tmp/.X11-unix/$SOCK:/tmp/.X11-unix/$SOCK")
+    done 
+fi
+
 ls /dev/kfd && DOCKER_OPTIONS+=(--device='/dev/kfd')
 
 if [ "$DOCKER_MINOR_VERSION" -lt "11" ]; then
