@@ -25,7 +25,7 @@ fi
 
 USERNAME=$(id -nu)
 DOCKER_HOME=/home/$USERNAME
-DOCKER_OPTIONS+=(-v="$HOME/.ssh:$DOCKER_HOME/.ssh:ro")
+DOCKER_OPTIONS+=(-v="$HOME/.ssh:$DOCKER_HOME/.ssh")
 DOCKER_OPTIONS+=(--cap-add SYS_PTRACE)
 # DOCKER_OPTIONS+=(--security-opt seccomp:unconfined --security-opt apparmor:unconfined)
 # DOCKER_OPTIONS+=(--privileged)
