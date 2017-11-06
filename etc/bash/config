@@ -2,7 +2,7 @@
 # echo "${BASH_SOURCE[0]}"
 export DOTFILES=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/../.. && pwd )
 
-export PATH="~/usr/bin:~/.local/bin:~/bin:$DOTFILES/bin:/usr/local/bin:$PATH"
+export PATH="$HOME/usr/bin:$HOME/.local/bin:$HOME/bin:$DOTFILES/bin:/usr/local/bin:$PATH"
 
 export CMAKE_PREFIX_PATH="$HOME/usr/"
 
