@@ -16,6 +16,7 @@ if [ -d /tmp/.X11-unix ]; then
 fi
 
 ls /dev/kfd && DOCKER_OPTIONS+=(--device='/dev/kfd')
+ls /dev/dri && DOCKER_OPTIONS+=(--device='/dev/dri' --group-add video)
 
 if [ "$DOCKER_MINOR_VERSION" -lt "11" ]; then
     DNS_SERVERS=$((nmcli dev list || nmcli dev show) 2> /dev/null | grep DNS | sed 's/\s\s*/\t/g' | cut -f 2)
