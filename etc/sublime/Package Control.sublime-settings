@@ -23,6 +23,7 @@
 		"SublimeLinter-cppcheck",
 		"SublimeLinter-pyflakes",
 		"SublimeLinter-pylint",
+		"Switch File Deluxe",
 		"Zeal"
 	]
 }
