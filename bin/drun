@@ -16,6 +16,7 @@ if [ -d /tmp/.X11-unix ]; then
 fi
 
 ls /dev/kfd && DOCKER_OPTIONS+=(--device='/dev/kfd')
+ls /dev/dri && DOCKER_OPTIONS+=(--device='/dev/dri' --group-add video)
 
 if [ "$DOCKER_MINOR_VERSION" -lt "11" ]; then
     DNS_SERVERS=$((nmcli dev list || nmcli dev show) 2> /dev/null | grep DNS | sed 's/\s\s*/\t/g' | cut -f 2)
@@ -32,7 +33,7 @@ fi
 
 USERNAME=$(id -nu)
 DOCKER_HOME=/home/$USERNAME
-DOCKER_OPTIONS+=(-v="$HOME/.ssh:$DOCKER_HOME/.ssh:ro")
+DOCKER_OPTIONS+=(-v="$HOME/.ssh:$DOCKER_HOME/.ssh")
 DOCKER_OPTIONS+=(--cap-add SYS_PTRACE)
 # DOCKER_OPTIONS+=(--security-opt seccomp:unconfined --security-opt apparmor:unconfined)
 # DOCKER_OPTIONS+=(--privileged)

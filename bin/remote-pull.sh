@@ -2,7 +2,7 @@
 
 source $DOTFILES/bin/remote-setup.sh
 
-RSYNC_EXCLUDE_OPTS=(--exclude ".hg" --exclude ".git" --exclude "*build" --exclude "build*")
+RSYNC_EXCLUDE_OPTS=(--exclude ".hg" --exclude ".git" --exclude "*build" --exclude "build*" --exclude ".tox")
 
 for i in "$@"
 do

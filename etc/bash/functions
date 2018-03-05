@@ -41,6 +41,10 @@ tz(){
   tar cf - $1 | gzip > $(basename $1).tar.gz
 }
 
+tx(){
+  tar cfJ $(basename $1).tar.xz $1
+}
+
 bak(){
   cp $1 $1.$(date +%Y%m%d%H%M%S)
 }
