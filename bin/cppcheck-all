@@ -1,0 +1,37 @@
+#!/bin/bash
+
+CPPCHECK_ENABLE=all
+CPPCHECK_ARGS=()
+CPPCHECK_FILES=()
+while (( "$#" ))
+do
+    arg="$1"
+    case "$arg" in
+    -w)
+        CPPCHECK_ENABLE=warning
+        ;;
+    -*)
+        CPPCHECK_ARGS+=($1)
+        ;;
+    *)
+        CPPCHECK_FILES+=($1)
+        ;;
+    esac
+    shift
+done
+
+if [ -z "$CPPCHECK_FILES" ]; then
+    CPPCHECK_FILES=(.)
+fi
+
+cppcheck \
+    --enable=$CPPCHECK_ENABLE \
+    -j $CPUCOUNT \
+    --quiet \
+    --force \
+    --template "{file}:{line}: {severity}: {message} [{id}]" \
+    --suppress='noExplicitConstructor' \
+    --suppress='ConfigurationNotChecked' \
+    --suppress='preprocessorErrorDirective' \
+    ${CPPCHECK_ARGS[@]} \
+    ${CPPCHECK_FILES[@]}
