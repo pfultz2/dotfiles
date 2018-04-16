@@ -1,3 +1,7 @@
+function view {
+    less +$(echo $1 | cut -d':' -f2) $(echo $1 | cut -d':' -f1)
+}
+
 function docker-use {
     eval "$(docker-machine env $1)"
 }
