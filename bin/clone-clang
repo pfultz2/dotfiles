@@ -1,0 +1,20 @@
+#!/bin/bash -e
+
+git clone git@github.com:llvm-mirror/llvm.git
+
+cd llvm/tools
+git clone git@github.com:llvm-mirror/clang.git
+cd ../..
+
+cd llvm/tools/clang/tools
+git clone git@github.com:llvm-mirror/clang-tools-extra.git extra
+cd ../../../..
+
+# cd llvm/projects
+# git clone http://llvm.org/git/compiler-rt.git
+# cd ../..
+
+cd llvm/projects
+git clone git@github.com:llvm-mirror/test-suite.git
+cd ../..
+

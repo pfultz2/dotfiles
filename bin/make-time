@@ -1,0 +1,13 @@
+#!/bin/bash
+
+OUTFILE=$(mktemp /tmp/make-time.XXXXXX)
+
+COUNT=5
+
+seq $COUNT | xargs -n1 -I {} sh -c "make clean && time -o $OUTFILE -a -f%e make $@"
+
+cat $OUTFILE
+
+echo "($(cat $OUTFILE | tr '\n' '+')0.0) / $COUNT" | bc -l | cut -c-5
+
+rm $OUTFILE

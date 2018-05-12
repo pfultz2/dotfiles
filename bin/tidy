@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -x
+
+TIDY=$((clang-tidy -version &> /dev/null && echo "clang-tidy") || (clang-tidy-5.0 -version &> /dev/null && echo "clang-tidy-5.0"))
+
+find .. -name '*.cpp' | xargs -n1 -P $(nproc) $TIDY -quiet -analyze-temporary-dtors -checks='bugprone-*,clang-analyzer-*,-clang-diagnostic-null-conversion,-clang-diagnostic-sign-conversion' -p=. -header-filter='.*h|hpp$'

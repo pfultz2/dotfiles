@@ -62,9 +62,7 @@ alias path='echo $PATH | tr -s ":" "\n"'
 # URL-encode strings
 alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.argv[1]);"'
 
-function cppcheck-all {
-    cppcheck --enable=all --force --template "{file}({line}): {severity} ({id}): {message}" --suppress='noExplicitConstructor' $(find -regex '.*/.*\.\(c\|cpp\|h\|hpp\|cl\)$')
-}
+alias a='cppcheck-all'
 
 if type -p subl > /dev/null && [[ ! -z "$DISPLAY" ]] ; then
     export EDITOR='subl -w'
