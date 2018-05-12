@@ -21,10 +21,15 @@
 		"ShellCommand",
 		"SideBarEnhancements",
 		"SublimeLinter",
+		"SublimeLinter Inline Errors",
 		"SublimeLinter-contrib-cmakelint",
+		"SublimeLinter-contrib-sublime-syntax",
+		"SublimeLinter-contrib-yamllint",
 		"SublimeLinter-cppcheck",
+		"SublimeLinter-json",
 		"SublimeLinter-pyflakes",
 		"SublimeLinter-pylint",
+		"SublimePythonIDE",
 		"Switch File Deluxe",
 		"Zeal"
 	]

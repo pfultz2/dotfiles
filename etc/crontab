@@ -1,0 +1,3 @@
+@hourly backup
+@daily backup clean
+@daily backup purge

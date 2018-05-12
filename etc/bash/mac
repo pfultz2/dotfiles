@@ -7,6 +7,8 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 
+alias sha256sum='shasum -a 256'
+
 export PATH="$PATH:/Applications/Sublime Text.app/Contents/SharedSupport/bin"
 export PATH="/usr/local/opt/gettext/bin:$PATH"
 

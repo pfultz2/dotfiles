@@ -1,3 +1,5 @@
 #!/bin/bash
 
-curl -L $1 | sha256sum | awk '{print $1}'
+SHA256=$((sha256sum &> /dev/null && echo "sha256sum") || echo "shasum -a 256")
+
+curl -L $1 | $SHA256 | awk '{print $1}'
