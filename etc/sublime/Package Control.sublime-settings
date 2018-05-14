@@ -5,6 +5,7 @@
 	],
 	"installed_packages":
 	[
+		"BetterSwitchHeaderImplementation",
 		"Case Conversion",
 		"Ciapre Color Scheme",
 		"Clang Format",

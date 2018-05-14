@@ -1,4 +1,35 @@
 // SublimeLinter Settings - User
 {
-    "debug": true
+    "debug": true,
+    "no_column_highlights_line": true,
+    "linters": {
+        "cppcheck": {
+            "args": [
+                "--suppress=noExplicitConstructor",
+                "--suppress=ConfigurationNotChecked",
+                "--suppress=preprocessorErrorDirective"
+            ],
+            "enable": ["all"]
+        }
+    },
+    "styles": [
+        {
+            "mark_style": "stippled_underline",
+            "priority": 1,
+            "scope": "region.yellowish markup.warning.sublime_linter",
+            "icon": "dot",
+            "types": [
+                "warning"
+            ]
+        },
+        {
+            "mark_style": "stippled_underline",
+            "priority": 1,
+            "scope": "region.redish markup.error.sublime_linter",
+            "icon": "dot",
+            "types": [
+                "error"
+            ]
+        }
+    ]
 }
