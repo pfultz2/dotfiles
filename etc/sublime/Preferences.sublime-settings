@@ -31,11 +31,14 @@
 		".git",
 		".hg",
 		"CVS",
-		".tox"
+		".tox",
+		"build",
+		"*build"
 	],
 	"font_size": 10,
 	"ignored_packages":
 	[
+		// "ClangComplete",
 		"Vintage"
 	],
 	"match_brackets_angle": true,
