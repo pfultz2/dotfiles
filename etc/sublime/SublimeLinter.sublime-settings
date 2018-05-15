@@ -5,6 +5,7 @@
     "linters": {
         "cppcheck": {
             "args": [
+                "--force",
                 "--suppress=noExplicitConstructor",
                 "--suppress=ConfigurationNotChecked",
                 "--suppress=preprocessorErrorDirective"

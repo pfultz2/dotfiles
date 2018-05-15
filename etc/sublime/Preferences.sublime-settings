@@ -23,7 +23,7 @@
 		"*.so",
 		"*.dylib"
 	],
-	"color_scheme": "Packages/Ciapre Color Scheme/Ciapre.tmTheme",
+	"color_scheme": "Packages/User/Ciapre (SublimePythonIDE).tmTheme",
 	"copy_with_empty_selection": false,
 	"folder_exclude_patterns":
 	[
@@ -38,7 +38,6 @@
 	"font_size": 10,
 	"ignored_packages":
 	[
-		// "ClangComplete",
 		"Vintage"
 	],
 	"match_brackets_angle": true,
