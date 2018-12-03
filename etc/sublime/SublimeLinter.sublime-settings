@@ -8,7 +8,11 @@
                 "--force",
                 "--suppress=noExplicitConstructor",
                 "--suppress=ConfigurationNotChecked",
-                "--suppress=preprocessorErrorDirective"
+                "--suppress=preprocessorErrorDirective",
+                "--suppress=unusedFunction",
+                "-I${project_path}/include",
+                "-I${project_path}/src/include"
+
             ],
             "enable": ["all"]
         }
