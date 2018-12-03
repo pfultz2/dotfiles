@@ -1,5 +1,4 @@
 {
-	"animation_enabled": false,
 	"auto_complete_cycle": true,
 	"binary_file_patterns":
 	[
@@ -40,13 +39,9 @@
 	"font_size": 10,
 	"ignored_packages":
 	[
-		"ClangComplete",
-		"SublimeLinter",
-		"SublimePythonIDE",
 		"Vintage"
 	],
 	"match_brackets_angle": true,
 	"theme": "Adaptive.sublime-theme",
-	"translate_tabs_to_spaces": true,
-	"tree_animation_enabled": false
+	"translate_tabs_to_spaces": true
 }
