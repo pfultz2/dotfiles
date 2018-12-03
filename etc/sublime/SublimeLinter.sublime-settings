@@ -1,6 +1,6 @@
 // SublimeLinter Settings - User
 {
-    "debug": true,
+    "debug": false,
     "no_column_highlights_line": true,
     "linters": {
         "cppcheck": {
