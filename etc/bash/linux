@@ -21,3 +21,8 @@ alias l='ls -CF'
 
 alias pbcopy="xclip -selection clipboard" 
 alias pbpaste="xclip -selection clipboard -o"
+
+ulimit -c unlimited
+
+# Use --user by default for pip
+PIP_USER=1
