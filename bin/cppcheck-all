@@ -10,6 +10,9 @@ do
     -w)
         CPPCHECK_ENABLE=warning
         ;;
+    -s)
+        CPPCHECK_ENABLE=warning,style
+        ;;
     -*)
         CPPCHECK_ARGS+=($1)
         ;;
@@ -29,8 +32,10 @@ cppcheck \
     -j $CPUCOUNT \
     --quiet \
     --force \
-    --template "{file}:{line}: {severity}: {message} [{id}]" \
     --suppress='noExplicitConstructor' \
+    --suppress='shadowVariable' \
+    --suppress='duplInheritedMember' \
+    --suppress='missingOverride' \
     --suppress='ConfigurationNotChecked' \
     --suppress='preprocessorErrorDirective' \
     ${CPPCHECK_ARGS[@]} \
