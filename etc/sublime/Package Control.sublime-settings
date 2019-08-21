@@ -5,9 +5,11 @@
 	],
 	"installed_packages":
 	[
+		"Agila Theme",
 		"BetterSwitchHeaderImplementation",
 		"Case Conversion",
 		"Ciapre Color Scheme",
+		"Ciapre Mod",
 		"Clang Format",
 		"CMake",
 		"CMakeEditor",
@@ -15,6 +17,7 @@
 		"DoxyDoc",
 		"Increment Selection",
 		"LLVM",
+		"Materialize",
 		"Package Control",
 		"Protobuf Syntax Hightlighting",
 		"SelectUntil",
@@ -32,6 +35,8 @@
 		"SublimeLinter-pylint",
 		"SublimePythonIDE",
 		"Switch File Deluxe",
+		"Theme - Autumn",
+		"x86 and x86_64 Assembly",
 		"Zeal"
 	]
 }

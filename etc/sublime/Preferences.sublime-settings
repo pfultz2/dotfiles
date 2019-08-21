@@ -2,6 +2,10 @@
 	"auto_complete_cycle": true,
 	"binary_file_patterns":
 	[
+		"*.a1",
+		"*.a2",
+		"*.a4",
+		"*.a5",
 		"*.jpg",
 		"*.jpeg",
 		"*.png",
@@ -32,8 +36,7 @@
 		".hg",
 		"CVS",
 		".tox",
-		"build",
-		"*build"
+		"build"
 	],
 	"font_size": 10,
 	"ignored_packages":

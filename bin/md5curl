@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MD5=$((md5sum &> /dev/null && echo "md5sum") || echo "md5")
+MD5=$((md5sum --version &> /dev/null && echo "md5sum") || echo "md5")
 
 curl -L $1 | $MD5 | awk '{print $1}'
 
