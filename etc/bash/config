@@ -64,6 +64,8 @@ alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.ar
 
 alias a='cppcheck-all'
 
+alias rr='remote-run.sh'
+
 if type -p subl > /dev/null && [[ ! -z "$DISPLAY" ]] ; then
     export EDITOR='subl -w'
     export EDITOR_FILE="subl"
