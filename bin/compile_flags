@@ -1,0 +1,89 @@
+#!/usr/bin/python3 
+import sys, os, json, fnmatch, functools
+
+def parse_flags(f):
+    flags = []
+    for line in open(f).readlines():
+        if line.startswith(('CXX_FLAGS', 'CXX_DEFINES', 'CXX_INCLUDES', 'C_FLAGS', 'C_DEFINES', 'C_INCLUDES')):
+            words = line[line.index('=')+1:].split()
+            flags.extend(words)
+    return flags
+
+def canonicalize_path(path, root):
+    if path.startswith('-I'): return '-I'+os.path.normpath(os.path.join(root, path[2:])) # rel or abs path
+    else: return path
+
+def parse_compile_commands(root, f):
+    flags = []
+    compile_commands = json.load(open(os.path.join(root, f)))
+    for obj in compile_commands:
+        for key, value in obj.items():
+            if key == "command":
+                for string in value.split()[1:]:
+                    # ninja adds local paths as -I. and -I..
+                    # make adds full paths as i flags
+                    flags.append(canonicalize_path(string, root))
+    return flags
+
+def merge_flags(flags, pflags):
+    result = []
+    def append_result(f):
+        if f.startswith(('-I', '-D', '-isystem', '-include', '-isysroot', '-W', '-std', '-pthread', '-f', '-pedantic', '-arch', '-m', '-hc')):
+            if f not in pflags and f not in result: result.append(f)
+        elif not f.startswith(('-O', '-o', '-c', '-g')) and f.startswith('-'): result.append(f)
+    flag = ""
+    for f in flags:
+        if f.startswith('-'):
+            append_result(flag)
+            flag = f
+        else: flag = flag + ' ' + f
+    append_result(flag)
+    return result
+
+def filter_flag(f, exclude_options):
+    for pat in exclude_options:
+        if fnmatch.fnmatch(f, pat): return False
+    return True
+
+ordered_std_flags = ['-std=c++0x', '-std=gnu++0x', '-std=c++11', '-std=gnu++11', '-std=c++1y', '-std=gnu++1y', '-std=c++14', '-std=gnu++14', '-std=c++1z', '-std=gnu++1z', '-std=c++17', '-std=gnu++17']
+def find_index(l, elem):
+    for i,x in enumerate(l): 
+        if x == elem: return i
+    return -1
+
+def std_flag_rank(x):
+    return find_index(ordered_std_flags, x)
+
+def max_std(x, y):
+    if (std_flag_rank(x) > std_flag_rank(y)): return x
+    else: return y
+
+def split_flags(flags, exclude_options):
+    result = []
+    std_flags = []
+    for f in flags:
+        if f.startswith('-std'): std_flags.append(f)
+        elif filter_flag(f, exclude_options): result.extend(f.split())
+    if len(std_flags) > 0: result.append(functools.reduce(max_std, std_flags))
+    return result
+
+def accumulate_options(path, exclude_options):
+    flags = []
+    for root, dirs, filenames in os.walk(path):
+        for f in filenames:
+            if f.endswith('compile_commands.json'):
+               flags.extend(merge_flags(parse_compile_commands(root, f), flags))
+               return split_flags(flags, exclude_options)
+            if f.endswith('flags.make'): 
+                flags.extend(merge_flags(parse_flags(os.path.join(root, f)), flags))
+    return split_flags(flags, exclude_options)
+
+def get_options(project_path, exclude_options, build_dirs):
+    build_dir = next((build_dir for d in build_dirs for build_dir in [os.path.join(project_path, d)] if os.path.exists(build_dir)), None)
+    if build_dir != None:
+        return accumulate_options(build_dir, exclude_options)
+    return []
+
+options = get_options(os.getcwd(), ["-W*unused-but-set-variable", "-W*maybe-uninitialized", "-W*logical-op", "-w"], ['build'])
+print('\n'.join(options))
+
