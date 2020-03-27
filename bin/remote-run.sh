@@ -2,4 +2,8 @@
 
 source $DOTFILES/bin/remote-setup.sh
 
-ssh $HOST "cd $DEST_DIR && $*"
+CMD="cd $DEST_DIR; $*"
+ssh -tt $HOST bash -l << EOF
+cd $DEST_DIR
+$*
+EOF

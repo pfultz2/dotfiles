@@ -42,6 +42,8 @@
 	],
 	"ignored_packages":
 	[
+		"Ciapre Mod",
+		"ClangComplete",
 		"Vintage"
 	],
 	"match_brackets_angle": true,
