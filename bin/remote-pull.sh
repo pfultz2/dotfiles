@@ -2,7 +2,7 @@
 
 source $DOTFILES/bin/remote-setup.sh
 
-RSYNC_EXCLUDE_OPTS=(--exclude ".hg" --exclude ".git" --exclude "*build/" --exclude "build*/" --exclude ".tox" --exclude "*.deb" --exclude "*.rpm" --exclude ".cache/")
+RSYNC_EXCLUDE_OPTS=(--exclude ".hg" --exclude ".git" --exclude "*build/" --exclude "build*/" --exclude ".tox" --exclude "*.deb" --exclude "*.rpm" --exclude ".cache/" --exclude=".ccls-cache/")
 RSYNC_RECURSIVE=--recursive
 
 for i in "$@"
