@@ -3,7 +3,7 @@
 DOCKER_MINOR_VERSION=$(docker --version | sed "s/.*Docker version \([^ ]*\).*$/\1/" | cut -f 2 -d.)
 CURRENT_DIR=${CURRENT_DIR:-`pwd`}
 DATA_DIR=${DATA_DIR:-/data}
-DOCKER_OPTIONS=(-v="$CURRENT_DIR:$DATA_DIR" -w /data)
+DOCKER_OPTIONS=(-v="$CURRENT_DIR:$DATA_DIR" -w $DATA_DIR)
 if [ -f /etc/localtime ]; then
     DOCKER_OPTIONS+=(-v='/etc/localtime:/etc/localtime')
 fi
@@ -34,6 +34,7 @@ fi
 USERNAME=$(id -nu)
 DOCKER_HOME=/home/$USERNAME
 DOCKER_OPTIONS+=(-v="$HOME/.ssh:$DOCKER_HOME/.ssh")
+DOCKER_OPTIONS+=(-v="$HOME/.ccache:/ccache")
 DOCKER_OPTIONS+=(--cap-add SYS_PTRACE)
 # DOCKER_OPTIONS+=(--security-opt seccomp:unconfined --security-opt apparmor:unconfined)
 # DOCKER_OPTIONS+=(--privileged)
