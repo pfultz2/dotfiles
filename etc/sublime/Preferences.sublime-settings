@@ -40,7 +40,6 @@
 		"*build",
 		"cget"
 	],
-	"font_size": 10,
 	"ignored_packages":
 	[
 		"Ciapre Mod",
