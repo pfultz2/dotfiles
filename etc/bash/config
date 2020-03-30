@@ -67,7 +67,12 @@ alias a='cppcheck-all'
 alias rr='remote-run.sh'
 alias cmake-ccache='cmake -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER_LAUNCHER=ccache'
 
-if type -p subl > /dev/null && [[ ! -z "$DISPLAY" ]] ; then
+if timeout 1 bash -c "</dev/tcp/localhost/52698 &>/dev/null"
+then
+    export EDITOR=rsubl
+    export EDITOR_FILE=rsubl
+    export EDITOR_DIR=ls
+elif type -p subl > /dev/null && [[ ! -z "$DISPLAY" ]] ; then
     export EDITOR='subl -w'
     export EDITOR_FILE="subl"
     export EDITOR_DIR="subl -n"

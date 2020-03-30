@@ -84,7 +84,12 @@ elif [ "$COMMAND" == "purge" ]; then
     ssh $HOST "mkdir -p $BACKUP_DIR/empty"
     echo "rsync -a --progress --delete $BACKUP_DIR/empty/ $BACKUP_DIR/$BACKUP/trash/"
     ssh $HOST "rsync -a --progress --delete $BACKUP_DIR/empty/ $BACKUP_DIR/$BACKUP/trash/"
-
+elif [ "$COMMAND" == "install" ]; then 
+    sudo crontab -u $USER - << EOF
+@hourly bash -l -c 'backup &> ~/.backup-log'
+@daily bash -l -c 'backup clean &> ~/.backup-clean-log'
+@daily bash -l -c 'backup purge'
+EOF
 else
     echo "Command $COMMAND not found"
 fi
