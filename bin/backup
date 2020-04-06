@@ -9,6 +9,10 @@ BACKUP_DIR=`ssh $HOST 'echo $HOME/backup'`
 RSYNC_EXCLUDE_FILE="$DOTFILES/etc/rsync/exclude"
 set -eu
 
+function backup_list {
+    ssh $HOST "ls -1 $BACKUP_DIR/$BACKUP | grep -v trash"
+}
+
 if [ "$#" -eq 0 ]; then
     COMMAND='backup'
 else
@@ -47,7 +51,7 @@ if [ "$COMMAND" == "backup" ]; then
     # --log-file=$SOURCE/.rsync/backuplog \
 
 elif [ "$COMMAND" == "ls" ]; then 
-    ssh $HOST "ls -1 $BACKUP_DIR/$BACKUP"
+    backup_list
 elif [ "$COMMAND" == "find" ]; then 
     if [ "$#" -ne 2 ]; then
         SRC=$(pwd)
@@ -69,21 +73,21 @@ elif [ "$COMMAND" == "find" ]; then
 elif [ "$COMMAND" == "clean" ]; then 
     DATE=$((gdate > /dev/null && echo "gdate") || echo "date")
     # Daily backups when older then 2 days
-    BACKUPS=$(ssh $HOST "ls -1 $BACKUP_DIR/$BACKUP"  | sort -r | tail -n +50 | awk -F'-' '_[$2+$3+$4]++')
+    BACKUPS=$(backup_list | grep -v current | sort -r | tail -n +50 | awk -F'-' '_[$2$3$4]++')
     for DIR in $BACKUPS; do
-        echo "Removing: $DIR"
+        echo "Removing daily: $DIR"
         ssh $HOST "mkdir -p $BACKUP_DIR/$BACKUP/trash && mv $BACKUP_DIR/$BACKUP/$DIR $BACKUP_DIR/$BACKUP/trash/"
     done
     # Monthly backups when older then 60 days
-    BACKUPS=$(ssh $HOST "ls -1 $BACKUP_DIR/$BACKUP"  | sort -r | tail -n +100 | awk -F'-' '_[$2+$3]++')
+    BACKUPS=$(backup_list | grep -v current | sort -r | tail -n +100 | awk -F'-' '_[$2$3]++')
     for DIR in $BACKUPS; do
-        echo "Removing: $DIR"
+        echo "Removing monthly: $DIR"
         ssh $HOST "mkdir -p $BACKUP_DIR/$BACKUP/trash && mv $BACKUP_DIR/$BACKUP/$DIR $BACKUP_DIR/$BACKUP/trash/"
     done
 elif [ "$COMMAND" == "purge" ]; then 
     ssh $HOST "mkdir -p $BACKUP_DIR/empty"
     echo "rsync -a --progress --delete $BACKUP_DIR/empty/ $BACKUP_DIR/$BACKUP/trash/"
-    ssh $HOST "rsync -a --progress --delete $BACKUP_DIR/empty/ $BACKUP_DIR/$BACKUP/trash/"
+    # ssh $HOST "rsync -a --progress --delete $BACKUP_DIR/empty/ $BACKUP_DIR/$BACKUP/trash/"
 elif [ "$COMMAND" == "install" ]; then 
     sudo crontab -u $USER - << EOF
 @hourly bash -l -c 'backup &> ~/.backup-log'
