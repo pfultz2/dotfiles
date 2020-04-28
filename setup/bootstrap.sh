@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 export DOTFILES=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. && pwd )
 
 echo "Add to bash profile: source $DOTFILES/etc/bash/config"
@@ -28,3 +30,8 @@ fi
 echo "Link sublime configuration"
 mkdir -p "$SUBLIME_PACKAGE_DIR"
 ln -s "$DOTFILES/etc/sublime" "$SUBLIME_PACKAGE_DIR/User"
+if [ "$(uname)" == "Darwin" ]; then
+    echo "Link key bindings"
+    mkdir -p ~/Library/KeyBindings
+    ln -s "$DOTFILES/etc/mac/DefaultKeyBinding.dict" ~/Library/KeyBindings/DefaultKeyBinding.dict
+fi
