@@ -20,17 +20,23 @@ alias firefox='open -a firefox'
 # alias dumpclip='xclip -selection clipboard -o'
 # alias pushclip='xclip -selection clipboard'
 
-if [[ $- == *i* ]]; then
-    if [ -f $(brew --prefix)/etc/bash_completion ]; then
-        . $(brew --prefix)/etc/bash_completion
+
+if [[ "$BASH_VERSION" ]]; then
+    if [[ $- == *i* ]]; then
+        if [ -f $(brew --prefix)/etc/bash_completion ]; then
+            . $(brew --prefix)/etc/bash_completion
+        fi
     fi
+    # Add completions for ssh hosts
+    complete -o default -o nospace -W "$(/usr/bin/env ruby -ne 'puts $_.split(/[,\s]+/)[1..-1].reject{|host| host.match(/\*|\?/)} if $_.match(/^\s*Host\s+/);' < $HOME/.ssh/config)" scp sftp ssh
 fi
 
+if [[ "$ZSH_VERSION" ]]; then
+    FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
+    autoload -Uz compinit
+    compinit -u
+fi
 # source /usr/local/bin/virtualenvwrapper.sh
-
-# Add completions for ssh hosts
-complete -o default -o nospace -W "$(/usr/bin/env ruby -ne 'puts $_.split(/[,\s]+/)[1..-1].reject{|host| host.match(/\*|\?/)} if $_.match(/^\s*Host\s+/);' < $HOME/.ssh/config)" scp sftp ssh
-
 
 # Capture process output
 # Needs to be enabled with csrutil enable --without dtrace

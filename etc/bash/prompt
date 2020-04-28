@@ -1,3 +1,4 @@
+if [[ "$BASH_VERSION" ]]; then
 PROMPT_DATE='\d'                     # the date  in  "Weekday  Month  Date"  format (e.g., "Tue May 26")
 PROMPT_ESCAPE='\e'                   # an ASCII escape character (033)
 PROMPT_SHORT_HOST='\h'               # the hostname up to the first `.'
@@ -17,12 +18,30 @@ PROMPT_HISTORY_NUMBER='\!'           # the history number of this command
 PROMPT_BEGIN='\['                    # begin a sequence of non-printing characters, which could be used to embed a terminal con­trol sequence into the prompt
 PROMPT_END='\]'                      # end a sequence of non-printing characters
 PROMPT_NEW_LINE='\n'
+fi
+
+if [[ "$ZSH_VERSION" ]]; then
+PROMPT_DATE=%D                       # the date  in  "Weekday  Month  Date"  format (e.g., "Tue May 26")
+PROMPT_SHORT_HOST=%m                 # the hostname up to the first `.'
+PROMPT_HOST=%M                       # the hostname
+PROMPT_SHELL_NAME=%N                 # the  name  of  the shell, the basename of $0 (the portion following the final slash)
+PROMPT_TIME_24=%T                    # the current time in 24-hour HH:MM:SS format
+PROMPT_TIME_12=%T                    # the current time in 12-hour HH:MM:SS format
+PROMPT_TIME=%@                       # the current time in 12-hour am/pm format
+PROMPT_USER=$n                       # the username of the current user
+PROMPT_CURRENT_WORKING_DIR=%d        # the current working directory
+PROMPT_BASE_CURRENT_WORKING_DIR='\W' # the  basename  of the current working direc­tory
+PROMPT_HISTORY_NUMBER=%!             # the history number of this command
+PROMPT_BEGIN=''                      # begin a sequence of non-printing characters, which could be used to embed a terminal con­trol sequence into the prompt
+PROMPT_END=''                        # end a sequence of non-printing characters
+PROMPT_NEW_LINE=$'\n'
+setopt PROMPT_SUBST
+fi
 
 # get current branch in git repo
 function parse_git_branch() {
     BRANCH=`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
-    if [ ! "${BRANCH}" == "" ]
-    then
+    if [[ "$BRANCH" ]]; then
         echo "[${BRANCH}]"
     else
         echo ""

@@ -1,6 +1,6 @@
 
-# echo "${BASH_SOURCE[0]}"
-export DOTFILES=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/../.. && pwd )
+SCRIPT_DIR=$(dirname ${BASH_SOURCE[0]-$0})
+export DOTFILES=$( cd "$SCRIPT_DIR"/../.. && pwd )
 
 export PATH="$HOME/usr/bin:$HOME/.local/bin:$HOME/bin:$DOTFILES/bin:/usr/local/bin:$PATH"
 
@@ -36,15 +36,17 @@ fi
 # colored GCC warnings and errors
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
-# pip bash completion start
-_pip_completion()
-{
-    COMPREPLY=( $( COMP_WORDS="${COMP_WORDS[*]}" \
-                   COMP_CWORD=$COMP_CWORD \
-                   PIP_AUTO_COMPLETE=1 $1 ) )
-}
-complete -o default -F _pip_completion pip
-# pip bash completion end
+if [[ "$BASH_VERSION" ]]; then
+    # pip bash completion start
+    _pip_completion()
+    {
+        COMPREPLY=( $( COMP_WORDS="${COMP_WORDS[*]}" \
+                       COMP_CWORD=$COMP_CWORD \
+                       PIP_AUTO_COMPLETE=1 $1 ) )
+    }
+    complete -o default -F _pip_completion pip
+    # pip bash completion end
+fi
 
 alias cpm='cget -p ~/usr'
 
@@ -100,5 +102,5 @@ source $DOTFILES/etc/bash/colors
 source $DOTFILES/etc/bash/functions
 
 [[ $- == *i* ]] && source $DOTFILES/etc/bash/prompt
-[[ $- == *i* ]] && PS1="\[$BIGreen\]$PROMPT_HOST:$PROMPT_USER\[$Green\][$PROMPT_TIME]\n\[$Blue\]$PROMPT_CURRENT_WORKING_DIR \[$Yellow\]$PROMPT_BRANCH\[$Color_Off\]$ "
-[[ $- == *i* ]] && PS2='\[\033[01;36m\]>'
+[[ $- == *i* ]] && PS1="$PROMPT_BEGIN$BIGreen$PROMPT_END$PROMPT_HOST:$PROMPT_USER$PROMPT_BEGIN$Green${PROMPT_END}[$PROMPT_TIME]$PROMPT_NEW_LINE$PROMPT_BEGIN$Blue$PROMPT_END$PROMPT_CURRENT_WORKING_DIR $PROMPT_BEGIN$Yellow$PROMPT_END$PROMPT_BRANCH$PROMPT_BEGIN$Color_Off$PROMPT_END$ "
+[[ $- == *i* ]] && PS2='$PROMPT_BEGIN\033[01;36m$PROMPT_END>'
