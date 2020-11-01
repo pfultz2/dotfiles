@@ -18,14 +18,15 @@ fi
 ls /dev/kfd && DOCKER_OPTIONS+=(--device='/dev/kfd')
 ls /dev/dri && DOCKER_OPTIONS+=(--device='/dev/dri' --group-add video)
 
-if [ "$DOCKER_MINOR_VERSION" -lt "11" ]; then
-    DNS_SERVERS=$((nmcli dev list || nmcli dev show) 2> /dev/null | grep DNS | sed 's/\s\s*/\t/g' | cut -f 2)
-    for SERVER in $DNS_SERVERS; do
-        DOCKER_OPTIONS+=(--dns $SERVER)
-    done
-else
-    DOCKER_OPTIONS+=(--network 'host' --userns 'host')
-fi
+# if [ "$DOCKER_MINOR_VERSION" -lt "11" ]; then
+#     DNS_SERVERS=$((nmcli dev list || nmcli dev show) 2> /dev/null | grep DNS | sed 's/\s\s*/\t/g' | cut -f 2)
+#     for SERVER in $DNS_SERVERS; do
+#         DOCKER_OPTIONS+=(--dns $SERVER)
+#     done
+# else
+#     DOCKER_OPTIONS+=(--network 'host' --userns 'host')
+# fi
+DOCKER_OPTIONS+=(--network 'host' --userns 'host')
 
 # TODO: use --add-host to add hosts from /etc/hosts
 
@@ -33,8 +34,10 @@ fi
 
 USERNAME=$(id -nu)
 DOCKER_HOME=/home/$USERNAME
+# DOCKER_OPTIONS+=(-p 52698:52698)
 DOCKER_OPTIONS+=(-v="$HOME/.ssh:$DOCKER_HOME/.ssh")
 DOCKER_OPTIONS+=(-v="$HOME/.ccache:/ccache")
+DOCKER_OPTIONS+=(-v="$CURRENT_HISTFILE:/.bash_history" -e HISTFILE=/.bash_history)
 DOCKER_OPTIONS+=(--cap-add SYS_PTRACE)
 # DOCKER_OPTIONS+=(--security-opt seccomp:unconfined --security-opt apparmor:unconfined)
 # DOCKER_OPTIONS+=(--privileged)
