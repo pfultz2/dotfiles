@@ -16,6 +16,8 @@
 		"DoxyDoc",
 		"Increment Selection",
 		"LLVM",
+		"LSP",
+		"Markdown Table Formatter",
 		"Materialize",
 		"Package Control",
 		"Protobuf Syntax Hightlighting",

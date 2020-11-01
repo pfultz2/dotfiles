@@ -13,6 +13,8 @@ alias sha256sum='shasum -a 256'
 export PATH="/usr/local/opt/gettext/bin:$PATH"
 export PATH="/usr/local/opt/ruby/bin:$PATH"
 
+export DISPLAY=:0
+
 # /usr/local/lib/ruby/gems/2.5.0/bin
 
 alias firefox='open -a firefox'
@@ -35,6 +37,7 @@ if [[ "$ZSH_VERSION" ]]; then
     FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
     autoload -Uz compinit
     compinit -u
+    alias history="history 1"
 fi
 # source /usr/local/bin/virtualenvwrapper.sh
 
