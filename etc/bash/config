@@ -68,7 +68,7 @@ alias a='cppcheck-all'
 
 alias rr='remote-run.sh'
 alias cmake-ccache='cmake -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER_LAUNCHER=ccache'
-alias ssh-subl='ssh -R 52698:localhost:52698'
+alias ssh-subl='autossh -R 52698:localhost:52698'
 
 # Persistent bash history for screen sessions
 if [[ $TERM == screen* ]]; then
