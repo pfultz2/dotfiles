@@ -18,6 +18,9 @@ fi
 echo "Link git configuration"
 ln -s $DOTFILES/etc/git/config ~/.gitconfig
 
+echo "Link screenrc"
+ln -s $DOTFILES/etc/.screenrc ~/.screenrc
+
 if [ "$(uname)" == "Darwin" ]; then
     export SUBLIME_PACKAGE_DIR=$HOME/Library/Application\ Support/Sublime\ Text\ 3/Packages
 elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ]; then
