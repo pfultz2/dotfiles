@@ -1,0 +1,8 @@
+defscrollback 10000
+# easier scroll
+#bindkey "^[[5~" eval 'copy' 'stuff ^b'  # PgUp   | Enter copy/scrollback mode and page up
+#bindkey "^[[6~" eval 'copy' 'stuff ^f'  # PgDown | Enter copy/scrollback mode and page down
+bindkey "^[[1;2A" eval 'copy' 'stuff Hk'  # Shift-Up   | Enter copy/scrollback mode and page up
+bindkey "^[[1;2B" eval 'copy' 'stuff Lj'  # Shift-Down | Enter copy/scrollback mode and page down
+
+
