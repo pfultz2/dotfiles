@@ -2,7 +2,7 @@
 SCRIPT_DIR=$(dirname ${BASH_SOURCE[0]-$0})
 export DOTFILES=$( cd "$SCRIPT_DIR"/../.. && pwd )
 
-export PATH="$HOME/usr/bin:$HOME/.local/bin:$HOME/bin:$DOTFILES/bin:/usr/local/bin:$PATH"
+export PATH="$HOME/usr/bin:$HOME/.local/bin:$HOME/bin:$HOME/.cargo/bin:$DOTFILES/bin:/usr/local/bin:$PATH"
 
 export CMAKE_PREFIX_PATH="$HOME/usr/"
 
