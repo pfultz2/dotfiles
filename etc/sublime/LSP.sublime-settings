@@ -2,6 +2,7 @@
     "log_debug": true,
     "log_stderr": true,
     "log_payloads": true,
+    "show_references_in_quick_panel": true,
     "clients": {
       "fps9300-0-clangd":
       {
