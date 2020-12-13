@@ -70,14 +70,19 @@ alias rr='remote-run.sh'
 alias cmake-ccache='cmake -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER_LAUNCHER=ccache'
 alias ssh-subl='autossh -R 52698:localhost:52698'
 
-# Persistent bash history for screen sessions
+# Persistent bash history for screen/tmux sessions
 if [[ $TERM == screen* ]]; then
-   declare SCREEN_NAME=$(echo $STY | sed -nr 's/[^.]*\.(.*)/\1/p')
+   mkdir -p $HISTFILE.d/
+   if [ -n "$TMUX" ]; then
+      declare SCREEN_NAME=$(tmux display-message -p '#S')
+      declare WINDOW=$(tmux display-message -p '#I')
+    else
+      declare SCREEN_NAME=$(echo $STY | sed -nr 's/[^.]*\.(.*)/\1/p')
+   fi
    if [[ $SCREEN_NAME ]]; then
-       HISTFILE="${HISTFILE}.${SCREEN_NAME}.${WINDOW}"
+       HISTFILE="${HISTFILE}.d/${SCREEN_NAME}.${WINDOW}"
        declare -p HISTFILE
    fi
-   unset SCREEN_NAME
 fi
 shopt -s histappend
 PROMPT_COMMAND='history -a'
@@ -110,6 +115,14 @@ function e {
         $EDITOR_FILE "$1"
     fi
 }
+
+if [[ "$BASH_VERSION" ]]; then
+    for i in $DOTFILES/etc/bash/completions/*; do
+        if [ -f $i ]; then
+            . $i
+        fi
+    done
+fi
 
 source $DOTFILES/etc/bash/colors
 source $DOTFILES/etc/bash/functions
