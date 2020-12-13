@@ -2,7 +2,7 @@
 SCRIPT_DIR=$(dirname ${BASH_SOURCE[0]-$0})
 export DOTFILES=$( cd "$SCRIPT_DIR"/../.. && pwd )
 
-export PATH="$HOME/usr/bin:$HOME/.local/bin:$HOME/bin:$DOTFILES/bin:/usr/local/bin:$PATH"
+export PATH="$HOME/usr/bin:$HOME/.local/bin:$HOME/bin:$HOME/.cargo/bin:$DOTFILES/bin:/usr/local/bin:$PATH"
 
 export CMAKE_PREFIX_PATH="$HOME/usr/"
 
@@ -68,7 +68,9 @@ alias a='cppcheck-all'
 
 alias rr='remote-run.sh'
 alias cmake-ccache='cmake -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER_LAUNCHER=ccache'
-alias ssh-subl='autossh -R 52698:localhost:52698'
+alias ssh-subl='ssh -R 52698:localhost:52698'
+
+alias vr='venv-run'
 
 # Persistent bash history for screen/tmux sessions
 if [[ $TERM == screen* ]]; then
@@ -84,7 +86,12 @@ if [[ $TERM == screen* ]]; then
        declare -p HISTFILE
    fi
 fi
+if [[ "$BASH_VERSION" ]]; then
 shopt -s histappend
+fi
+if [[ "$ZSH_VERSION" ]]; then
+setopt APPEND_HISTORY
+fi
 PROMPT_COMMAND='history -a'
 export CURRENT_HISTFILE=$HISTFILE
 

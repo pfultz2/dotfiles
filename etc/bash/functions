@@ -6,6 +6,12 @@ function docker-use {
     eval "$(docker-machine env $1)"
 }
 
+function venv-run() {
+    . $(find . | grep 'activate$' | head -n1)
+    "$@"
+    deactivate
+}
+
 # Setup paths
 pathremove() {
   ABSPATH=`cd $1 && pwd`
