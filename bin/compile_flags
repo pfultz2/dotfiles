@@ -28,7 +28,7 @@ def parse_compile_commands(root, f):
 def merge_flags(flags, pflags):
     result = []
     def append_result(f):
-        if f.startswith(('-I', '-D', '-isystem', '-include', '-isysroot', '-W', '-std', '-pthread', '-f', '-pedantic', '-arch', '-m', '-hc', '-amdgpu', '-x', '--hip-device-lib-path', '--cuda-gpu-arch', '-Xclang')):
+        if f.startswith(('-I', '-D', '-isystem', '-include', '-isysroot', '-W', '-std', '-pthread', '-f', '-pedantic', '-arch', '-m', '-hc', '-amdgpu', '-x', '--hip-device-lib-path', '--hip-link', '--cuda-gpu-arch', '--offload-arch', '-Xclang')):
             if f not in pflags and f not in result: result.append(f)
         elif not f.startswith(('-O', '-o', '-c', '-g', '-L', '-l')) and f.startswith('-'): result.append(f)
     flag = ""
