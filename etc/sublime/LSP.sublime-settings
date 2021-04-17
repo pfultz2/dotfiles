@@ -8,11 +8,11 @@
         "command": 
         [
           "ssh",
-          "-tt",
+          // "-tt",
           "paul-radeon4",
           "/opt/rocm/llvm/bin/clangd",
           "--log=verbose",
-          "--header-insertion=never" 
+          "--header-insertion=never"
         ],
         "languages": [{
             "scopes": ["source.c"],
