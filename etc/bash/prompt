@@ -18,6 +18,7 @@ PROMPT_HISTORY_NUMBER='\!'           # the history number of this command
 PROMPT_BEGIN='\['                    # begin a sequence of non-printing characters, which could be used to embed a terminal control sequence into the prompt
 PROMPT_END='\]'                      # end a sequence of non-printing characters
 PROMPT_NEW_LINE='\n'
+PROMPT_ITERM2_MARK='\[$(iterm2_prompt_mark)\]'
 fi
 
 if [[ "$ZSH_VERSION" ]]; then
@@ -35,6 +36,7 @@ PROMPT_HISTORY_NUMBER=%!             # the history number of this command
 PROMPT_BEGIN='%{'                      # begin a sequence of non-printing characters, which could be used to embed a terminal control sequence into the prompt
 PROMPT_END='%}'                        # end a sequence of non-printing characters
 PROMPT_NEW_LINE=$'\n'
+PROMPT_ITERM2_MARK='%{$(iterm2_prompt_mark)%}'
 setopt PROMPT_SUBST
 fi
 
