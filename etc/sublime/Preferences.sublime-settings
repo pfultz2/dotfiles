@@ -27,7 +27,7 @@
 		"*.so",
 		"*.dylib"
 	],
-	"color_scheme": "Packages/User/Ciapre (SublimePythonIDE).tmTheme",
+	"color_scheme": "Packages/Color Scheme - Default/Mariana.sublime-color-scheme",
 	"copy_with_empty_selection": false,
 	"folder_exclude_patterns":
 	[
@@ -47,7 +47,7 @@
 	"ignored_packages":
 	[
 		"ClangComplete",
-		"Vintage"
+		"Vintage",
 	],
 	"match_brackets_angle": true,
 	"show_full_path": true,
@@ -55,5 +55,5 @@
 	"theme_font_options":
 	[
 	],
-	"translate_tabs_to_spaces": true
+	"translate_tabs_to_spaces": true,
 }
