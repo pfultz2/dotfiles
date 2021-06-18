@@ -73,6 +73,9 @@ alias et-subl='et -r 52698:52698'
 
 alias vr='venv-run'
 
+alias hh=hstr
+export HSTR_CONFIG=hicolor
+
 # Persistent bash history for screen/tmux sessions
 if [[ $TERM == screen* ]]; then
    mkdir -p $HISTFILE.d/
@@ -153,3 +156,14 @@ if [[ "$ZSH_VERSION" ]]; then
   source $DOTFILES/etc/bash/iterm2.zsh
 fi
 
+if type -p hstr > /dev/null ; then
+    if [[ "$BASH_VERSION" ]]; then
+        # if this is interactive shell, then bind hstr to Ctrl-r (for Vi mode check doc)
+        if [[ $- =~ .*i.* ]]; then bind '"\C-r": "\C-a hstr -- \C-j"'; fi
+        # if this is interactive shell, then bind 'kill last command' to Ctrl-x k
+        if [[ $- =~ .*i.* ]]; then bind '"\C-xk": "\C-a hstr -k \C-j"'; fi
+    fi
+    if [[ "$ZSH_VERSION" ]]; then
+        bindkey -s "\C-r" "\C-a hstr -- \C-j"     # bind hstr to Ctrl-r (for Vi mode check doc)
+    fi
+fi
