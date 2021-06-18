@@ -47,7 +47,7 @@ fi
 
 # Redirect the port in the NAT router
 #
-upnpc -r $port udp >/dev/null ||\
+upnpc -r $port udp ||\
  echo "Failed to redirect port $port. Continuing anyway..." >&2
 
 # Make a program that executes a shell, removes the port direction

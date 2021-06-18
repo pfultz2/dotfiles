@@ -9,11 +9,11 @@
         "command": 
         [
           "ssh",
-          "-tt",
+          // "-tt",
           "paul-radeon4",
           "/opt/rocm/llvm/bin/clangd",
           "--log=verbose",
-          "--header-insertion=never" 
+          "--header-insertion=never"
         ],
         "languages": [{
             "scopes": ["source.c"],
@@ -42,10 +42,17 @@
           "-tt",
           "fps9300-0",
           // "/opt/rocm/hcc/bin/clangd",
-          "/usr/local/bin/clangd",
+          // "/usr/local/bin/clangd",
+          "/opt/rocm/llvm/bin/clangd",
           "--log=verbose",
           "--header-insertion=never" 
         ],
+        // [
+        //   "et",
+        //   "fps9300-0",
+        //   "-c",
+        //   "/opt/rocm/llvm/bin/clangd --log=verbose --header-insertion=never"
+        // ],
         "languages": [{
             "scopes": ["source.c"],
             "syntaxes": ["Packages/C++/C.sublime-syntax"],
