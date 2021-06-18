@@ -14,6 +14,7 @@
 		"CMakeEditor",
 		"Dockerfile Syntax Highlighting",
 		"DoxyDoc",
+		"Hjson",
 		"Increment Selection",
 		"LLVM",
 		"LSP",
@@ -39,6 +40,6 @@
 		"Switch File Deluxe",
 		"Theme - Autumn",
 		"x86 and x86_64 Assembly",
-		"Zeal"
-	]
+		"Zeal",
+	],
 }
