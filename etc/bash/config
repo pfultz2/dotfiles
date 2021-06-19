@@ -76,6 +76,10 @@ alias vr='venv-run'
 alias hh=hstr
 export HSTR_CONFIG=hicolor
 
+if type -p lsd > /dev/null ; then
+    alias ls='lsd'
+fi
+
 # Persistent bash history for screen/tmux sessions
 if [[ $TERM == screen* ]]; then
    mkdir -p $HISTFILE.d/
