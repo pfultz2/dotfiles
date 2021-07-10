@@ -38,7 +38,8 @@
 		".tox",
 		"build",
 		"*build",
-		"cget"
+		"cget",
+		"daca"
 	],
 	"font_options":
 	[
