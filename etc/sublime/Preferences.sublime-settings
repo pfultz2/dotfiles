@@ -27,7 +27,7 @@
 		"*.so",
 		"*.dylib"
 	],
-	"color_scheme": "Packages/User/Ciapre (SublimePythonIDE).tmTheme",
+	"color_scheme": "Packages/Color Scheme - Default/Mariana.sublime-color-scheme",
 	"copy_with_empty_selection": false,
 	"folder_exclude_patterns":
 	[
@@ -38,7 +38,8 @@
 		".tox",
 		"build",
 		"*build",
-		"cget"
+		"cget",
+		"daca"
 	],
 	"font_options":
 	[

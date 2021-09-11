@@ -13,6 +13,9 @@ ln -s $DOTFILES/etc/.screenrc ~/.screenrc
 echo "Link tmux configuration"
 ln -s $DOTFILES/etc/.tmux.conf ~/.tmux.conf
 
+echo "Link nanorc"
+ln -s $DOTFILES/etc/.nanorc ~/.nanorc
+
 if [ "$(uname)" == "Darwin" ]; then
     export SUBLIME_PACKAGE_DIR=$HOME/Library/Application\ Support/Sublime\ Text\ 3/Packages
 elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ]; then
