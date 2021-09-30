@@ -108,7 +108,7 @@ fi
 # Persistent bash history for vscode sessions
 if [[ $TERM_PROGRAM == vscode ]]; then
     mkdir -p $HISTFILE.d/
-    HISTFILE="${HISTFILE}.d/$(basename $(pwd))"
+    HISTFILE="${HISTFILE}.d/$(basename $(pwd)).vscode"
 fi
 touch $HISTFILE
 if type -p mcfly > /dev/null ; then
