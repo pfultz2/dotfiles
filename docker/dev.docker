@@ -6,8 +6,8 @@ RUN apt-get install -y \
     build-essential \
     bc \
     ccache \
-    clang-format-5.0 \
-    clang-tidy-5.0 \
+    clang-format-10 \
+    clang-tidy-10 \
     cmake \
     cmake-curses-gui \
     curl \
@@ -20,8 +20,8 @@ RUN apt-get install -y \
     make \
     man-db \
     nano \
-    python-dev \
-    python-pip \
+    python3-dev \
+    python3-pip \
     ssh \
     software-properties-common \
     strace \
@@ -32,6 +32,12 @@ RUN apt-get install -y \
     wget \
     xclip \
     zip
+
+RUN apt-get install -y python-dev \
+    python-pip \
+    clang-format-5.0 \
+    clang-tidy-5.0 \
+    || echo
 
 RUN pip install cget backports.lzma
 RUN mkdir -p /data
