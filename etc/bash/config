@@ -130,7 +130,12 @@ fi
 PROMPT_COMMAND="history -a;$PROMPT_COMMAND"
 export CURRENT_HISTFILE=$HISTFILE
 
-if type -p timeout > /dev/null && timeout 1 bash -c "</dev/tcp/localhost/52698 &>/dev/null" &> /dev/null
+if [[ $TERM_PROGRAM == vscode ]];
+then
+    export EDITOR='code -w'
+    export EDITOR_FILE="code"
+    export EDITOR_DIR="code -n"
+elif type -p timeout > /dev/null && timeout 1 bash -c "</dev/tcp/localhost/52698 &>/dev/null" &> /dev/null
 then
     export EDITOR=rsubl
     export EDITOR_FILE=rsubl
