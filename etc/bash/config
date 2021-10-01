@@ -104,9 +104,8 @@ if [[ $TERM == screen* ]]; then
    PWD_FILE="$HISTFILE.pwd"
    [ -s $PWD_FILE ] && cd `cat $PWD_FILE`
    PROMPT_COMMAND="pwd > $PWD_FILE;$PROMPT_COMMAND"
-fi
 # Persistent bash history for vscode sessions
-if [[ $TERM_PROGRAM == vscode ]]; then
+elif [[ $TERM_PROGRAM == vscode ]]; then
     mkdir -p $HISTFILE.d/
     HISTFILE="${HISTFILE}.d/$(basename $(pwd)).vscode"
 fi
@@ -120,14 +119,15 @@ if type -p mcfly > /dev/null ; then
     fi
 elif type -p hstr > /dev/null ; then
     eval "$(hstr --show-configuration)"
+else
+    if [[ "$BASH_VERSION" ]]; then
+        shopt -s histappend
+    fi
+    if [[ "$ZSH_VERSION" ]]; then
+        setopt APPEND_HISTORY
+    fi
+    PROMPT_COMMAND="history -a;$PROMPT_COMMAND"
 fi
-if [[ "$BASH_VERSION" ]]; then
-    shopt -s histappend
-fi
-if [[ "$ZSH_VERSION" ]]; then
-    setopt APPEND_HISTORY
-fi
-PROMPT_COMMAND="history -a;$PROMPT_COMMAND"
 export CURRENT_HISTFILE=$HISTFILE
 
 if [[ $TERM_PROGRAM == vscode ]];
