@@ -13,6 +13,9 @@
           "paul-radeon4",
           "/opt/rocm/llvm/bin/clangd",
           "--log=verbose",
+          "--path-mappings=/Volumes/paul-radeon4=/home/paul",
+          "--compile-commands-dir=build/",
+          "--recovery-ast",
           "--header-insertion=never"
         ],
         "languages": [{
@@ -138,7 +141,12 @@
       },
       "clangd":
       {
-        "command": ["/usr/local/opt/llvm/bin/clangd", "--clang-tidy", "--clang-tidy-checks='boost-*,bugprone-*,cert-*,clang-analyzer-*,clang-diagnostic-*,performance-*,readability-*'"],
+        "command": [
+          "/usr/local/opt/llvm/bin/clangd",
+          "--clang-tidy",
+          "--clang-tidy-checks='boost-*,bugprone-*,cert-*,clang-analyzer-*,clang-diagnostic-*,performance-*,readability-*'",
+          "--header-insertion=never"
+        ],
         "languages": [{
             "scopes": ["source.c"],
             "syntaxes": ["Packages/C++/C.sublime-syntax"],
