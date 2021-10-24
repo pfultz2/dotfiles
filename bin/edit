@@ -7,8 +7,10 @@ remote_match = [
 ]
 
 def remote_matches(f):
+    fullpath = os.path.abspath(f)
     for pattern in remote_match:
-        if fnmatch.fnmatchcase(f, pattern):
+        p = os.path.expanduser(pattern)
+        if fnmatch.fnmatchcase(fullpath, p):
             return True
     return False
 

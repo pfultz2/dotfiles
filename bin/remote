@@ -111,6 +111,8 @@ def remote_sync(args, f, pipe=None):
     pargs = parser.parse_args(args)
     local = pargs.file or os.getcwd()
     host = get_remote_host(local)
+    if host in mounts:
+        return 0
     remote_path = get_remote_path(host, local)
     remote = '{}:{}'.format(host, remote_path)
     # Make sure local directory exists
