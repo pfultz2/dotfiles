@@ -1,0 +1,46 @@
+#!/usr/bin/python3
+
+import argparse, shutil, subprocess, os, fnmatch
+
+remote_match = [
+    '~/*'
+]
+
+def remote_matches(f):
+    for pattern in remote_match:
+        if fnmatch.fnmatchcase(f, pattern):
+            return True
+    return False
+
+def flag(b, s):
+    if b:
+        return [s]
+    else:
+        return []
+
+def tmcommand(name, args):
+    return [shutil.which(name)] + flag(args.wait, '-w') + flag(args.new_window or os.path.isdir(args.file), '-n') + [args.file]
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('file', help='file/folder to edit', default=os.getcwd())
+    parser.add_argument('--new-window', '-n', action='store_true', help='Open a new window')
+    parser.add_argument('--wait', '-w', action='store_true', help='Wait for the files to be closed before returning')
+    args = parser.parse_args()
+
+    if os.environ.get('TERM_PROGRAM', '') == 'vscode':
+        subprocess.run(tmcommand('code', args))
+    elif 'SUBLIME_REMOTE_PORT' in os.environ and remote_matches(args.file) and not args.wait:
+        subprocess.run([shutil.which('dest'), 'open', args.file])
+    elif 'RMATE_PORT' in os.environ and os.path.isfile(args.file):
+        subprocess.run(tmcommand('rsubl', args))
+    elif 'DISPLAY' in os.environ and shutil.which('subl') and not os.environ.get('EDIT_DISABLE_GUI', False):
+        subprocess.run(tmcommand('subl', args))
+    elif shutil.which('nano') and os.path.isfile(args.file):
+        subprocess.run([shutil.which('nano'), args.file])
+    elif os.path.isfile(args.file):
+        subprocess.run([shutil.which('cat'), args.file])
+    elif os.path.isdir(args.file):
+        subprocess.run([shutil.which('ls'), args.file])
+

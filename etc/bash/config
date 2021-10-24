@@ -130,6 +130,16 @@ else
 fi
 export CURRENT_HISTFILE=$HISTFILE
 
+if [ -n "$TMUX" ]; then
+    function refresh_env {
+        eval "$(tmux showenv -s)"
+    }
+else
+    function refresh_env {
+        echo
+    }
+fi
+
 if [[ $TERM_PROGRAM == vscode ]];
 then
     export EDITOR='code -w'
@@ -175,8 +185,10 @@ source $DOTFILES/etc/bash/colors
 source $DOTFILES/etc/bash/functions
 
 [[ $- == *i* ]] && source $DOTFILES/etc/bash/prompt
-[[ $- == *i* ]] && PS1="$PROMPT_BEGIN$BIGreen$PROMPT_END$PROMPT_HOST:$PROMPT_USER$PROMPT_BEGIN$Green${PROMPT_END}[$PROMPT_TIME]$PROMPT_NEW_LINE$PROMPT_ITERM2_MARK$PROMPT_BEGIN$Blue$PROMPT_END$PROMPT_CURRENT_WORKING_DIR $PROMPT_BEGIN$Yellow$PROMPT_END$PROMPT_BRANCH$PROMPT_BEGIN$Color_Off$PROMPT_END$ "
+[[ $- == *i* ]] && PS1="$PROMPT_BEGIN$BIGreen$PROMPT_END$PROMPT_HOST:$PROMPT_USER$PROMPT_BEGIN$Green${PROMPT_END}[$PROMPT_TIME]$PROMPT_NEW_LINE$PROMPT_BEGIN$Blue$PROMPT_END$PROMPT_CURRENT_WORKING_DIR $PROMPT_BEGIN$Yellow$PROMPT_END$PROMPT_BRANCH$PROMPT_BEGIN$Color_Off$PROMPT_END$ "
 [[ $- == *i* ]] && PS2='$PROMPT_BEGIN\033[01;36m$PROMPT_END>'
+[[ $- == *i* ]] && PROMPT_COMMAND+=refresh_env
+[[ $- == *i* ]] && precmd_functions=(refresh_env)
 
 if [[ "$BASH_VERSION" ]]; then
   export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=yes
