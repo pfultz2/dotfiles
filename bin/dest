@@ -1,0 +1,24 @@
+#!/usr/bin/python3
+
+import argparse, shutil, shlex, socket, subprocess, os, sys, socketserver, threading
+
+def netcat(hostname, port, content):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((hostname, port))
+        s.sendall(content.encode('utf-8'))
+        # s.shutdown(socket.SHUT_WR)
+        while 1:
+            data = s.recv(64)
+            if data:
+                sys.stdout.buffer.write(data)
+            else:
+                break
+
+def transform_arg(arg):
+    if os.path.exists(arg):
+        return os.path.abspath(arg)
+    return arg
+
+if __name__ == "__main__":
+    args = [transform_arg(arg) for arg in sys.argv[1:]]
+    netcat('localhost', 52697, ' '.join(args) + "\n")
