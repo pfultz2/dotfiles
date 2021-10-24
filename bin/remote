@@ -195,7 +195,7 @@ def start_server(host):
     return server
 
 def bash_command():
-    return ['env', 'SUBLIME_RSUBL=52698', 'SUBLIME_REMOTE=52697', '$SHELL', '-il']
+    return ['env', 'RMATE_PORT=52698', 'SUBLIME_REMOTE_PORT=52697', '$SHELL', '-il']
 
 def connect_et(host, no_terminal=False):
     result = [shutil.which('et'), '-r', '52697:52697,52698:52698']

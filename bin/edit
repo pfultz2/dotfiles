@@ -31,9 +31,9 @@ if __name__ == "__main__":
 
     if os.environ.get('TERM_PROGRAM', '') == 'vscode':
         subprocess.run(tmcommand('code', args))
-    elif 'SUBLIME_REMOTE' in os.environ and remote_matches(args.file) and not args.wait:
+    elif 'SUBLIME_REMOTE_PORT' in os.environ and remote_matches(args.file) and not args.wait:
         subprocess.run([shutil.which('dest'), 'open', args.file])
-    elif 'SUBLIME_RSUBL' in os.environ and os.path.isfile(args.file):
+    elif 'RMATE_PORT' in os.environ and os.path.isfile(args.file):
         subprocess.run(tmcommand('rsubl', args))
     elif 'DISPLAY' in os.environ and shutil.which('subl') and not os.environ.get('EDIT_DISABLE_GUI', False):
         subprocess.run(tmcommand('subl', args))
