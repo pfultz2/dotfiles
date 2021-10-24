@@ -160,7 +160,7 @@ def create_connection_handler(hostname):
         def command_open(self, args):
             f = self.get_local(args[0])
             cmd = [shutil.which('subl')]
-            synced = False
+            synced = self.hostname in mounts
             # If it doesnt exists then sync it first
             if not os.path.exists(f):
                 synced = True
