@@ -1,16 +1,16 @@
-import sublime_plugin, os
+import sublime_plugin, os, sys
+
+__script_dir__ = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(__script_dir__)
+import remote
 
 
 class RemoteEdit(sublime_plugin.EventListener):
     def on_post_save(self, view):
-        home = os.path.expanduser("~")
-        remote = home + '/remote/'
-
         filename = view.file_name()
-        if filename.startswith(remote):
-            host = filename[len(remote):].split('/')[0]
-            remote_host = remote + host
-            dest = filename[len(remote_host):]
-            target = "/usr/bin/scp '{0}' {1}:'{2}'".format(filename, host, dest)
-            print(target)
-            os.system(target + " &")
+        host = remote.get_remote_host(filename)
+        print(filename, host)
+        if remote.needs_sync(host):
+            remote_path = remote.get_remote_path(host, filename)
+            dst = '{}:{}'.format(host, remote_path)
+            remote.rsync(filename, dst)
