@@ -161,7 +161,7 @@ source $DOTFILES/etc/bash/functions
 [[ $- == *i* ]] && source $DOTFILES/etc/bash/prompt
 [[ $- == *i* ]] && PS1="$PROMPT_BEGIN$BIGreen$PROMPT_END$PROMPT_HOST:$PROMPT_USER$PROMPT_BEGIN$Green${PROMPT_END}[$PROMPT_TIME]$PROMPT_NEW_LINE$PROMPT_BEGIN$Blue$PROMPT_END$PROMPT_CURRENT_WORKING_DIR $PROMPT_BEGIN$Yellow$PROMPT_END$PROMPT_BRANCH$PROMPT_BEGIN$Color_Off$PROMPT_END$ "
 [[ $- == *i* ]] && PS2='$PROMPT_BEGIN\033[01;36m$PROMPT_END>'
-[[ $- == *i* ]] && PROMPT_COMMAND+=refresh_env
+[[ $- == *i* ]] && PROMPT_COMMAND="refresh_env;$PROMPT_COMMAND"
 [[ $- == *i* ]] && precmd_functions=(refresh_env)
 
 if [[ "$BASH_VERSION" ]]; then
