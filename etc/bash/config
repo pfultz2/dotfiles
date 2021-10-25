@@ -136,7 +136,7 @@ if [ -n "$TMUX" ]; then
     }
 else
     function refresh_env {
-        echo
+        echo > /dev/null
     }
 fi
 
