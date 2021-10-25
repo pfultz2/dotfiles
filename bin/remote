@@ -14,8 +14,10 @@ def find_mount_point(path):
     return path if path != '/' else None
 
 def get_mounts():
-    if os.path.exists('~/.mounts.json'):
-        return json.load('~/.mounts.json')
+    mounts_path = os.path.expanduser('~/.mounts.json')
+    if os.path.exists(mounts_path):
+        with open(mounts_path) as f:
+            return json.load(f)
     return {}
 
 mounts = get_mounts()
@@ -241,6 +243,11 @@ def mosh(args):
     server.shutdown()
     etp.kill()
     return cp.returncode
+
+@command
+def mount(args):
+    print(json.dumps(mounts))
+    return 0
 
 if __name__ == "__main__":
     cmd = sys.argv[1]
