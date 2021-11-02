@@ -1,7 +1,7 @@
 import sublime_plugin, os, sys
 
-__script_dir__ = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(__script_dir__)
+__py_dir__ = os.path.normpath(os.path.join(os.path.realpath(__file__), '..', '..', '..', 'py'))
+sys.path.append(__py_dir__)
 import remote
 
 

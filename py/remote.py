@@ -1,6 +1,16 @@
 import os, json, subprocess, shutil
 
 DRY_RUN=False
+exclude_sync = [
+    '.hg',
+    '.git',
+    '*build/',
+    'build*/',
+    '.tox',
+    '*.deb',
+    '*.rpm',
+    '.cache/'
+]
 remote_dir = os.path.expanduser('~/remote')
 
 def get_mounts():
@@ -53,6 +63,13 @@ def remove_trail_slash(s):
         return s[:-1]
     return s
 
+def remote_isdir(host, path):
+    return subprocess.run(['ssh', host, 'test -d {}'.format(shlex.quote(path))]).returncode == 0
+
+def pipe_writeline(pipe, s):
+    if pipe:
+        pipe.write((s + "\n").encode('utf-8'))
+
 def rsync(src, dst, exclude=None, delete=False, shallow=False, **kwargs):
     cmd = [shutil.which('rsync'), '--verbose', '--times', '--compress', '--progress']
     if DRY_RUN:
@@ -76,3 +93,32 @@ def rsync(src, dst, exclude=None, delete=False, shallow=False, **kwargs):
         cmd.append(dst)
     print(' '.join(cmd))
     return subprocess.run(cmd, **kwargs).returncode
+
+def remote_sync(args, f, pipe=None):
+    parser = argparse.ArgumentParser()
+    parser.add_argument('file', help='file to sync with remote')
+    parser.add_argument('--delete', '-d', action='store_true', help='delete files missing')
+    parser.add_argument('--all', '-a', action='store_true', help='dont exclude any files')
+    parser.add_argument('--shallow', '-s', action='store_true', help='only sync current directory')
+    pargs = parser.parse_args(args)
+    local = pargs.file or os.getcwd()
+    host = get_remote_host(local)
+    if host in mounts:
+        return 0
+    remote_path = get_remote_path(host, local)
+    remote = '{}:{}'.format(host, remote_path)
+    # Make sure local directory exists
+    if not os.path.exists(local):
+        if remote_isdir(host, remote_path):
+            os.makedirs(local)
+        elif not os.path.exists(os.path.dirname(local)):
+            os.makedirs(os.path.dirname(local))
+    src, dst = f(local, remote)
+    exclude = not pargs.all if os.path.isdir(local) else False
+    return rsync(src, dst, exclude=exclude_sync if exclude else [], delete=pargs.delete, shallow=pargs.shallow, stdout=pipe, stderr=subprocess.STDOUT)
+
+def pull(args, pipe=None):
+    return remote_sync(args, lambda local, remote: (remote, local), pipe=pipe)
+
+def push(args, pipe=None):
+    return remote_sync(args, lambda local, remote: (local, remote), pipe=pipe)

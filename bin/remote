@@ -1,139 +1,22 @@
 #!/usr/bin/python3
 
 import argparse, shutil, shlex, subprocess, os, sys, socketserver, threading, json
+__py_dir__ = os.path.normpath(os.path.join(os.path.realpath(__file__), '..', '..', 'py'))
+sys.path.append(__py_dir__)
+import remote
 
 __commands__ = {}
 def command(f):
     __commands__[f.__name__] = f
     return f
 
-def find_mount_point(path):
-    path = os.path.realpath(path)
-    while not os.path.ismount(path) and path != '/':
-        path = os.path.dirname(path)
-    return path if path != '/' else None
-
-def get_mounts():
-    mounts_path = os.path.expanduser('~/.mounts.json')
-    if os.path.exists(mounts_path):
-        with open(mounts_path) as f:
-            return json.load(f)
-    return {}
-
-mounts = get_mounts()
-remote_dir = os.path.expanduser('~/remote')
-def get_local_path(host, path):
-    if host in mounts:
-        m = mounts[host]
-        local = m[0]
-        remote = m[1]
-        return path.replace(remote, local)
-    return os.path.join(remote_dir, host, path[1:])
-
-def get_remote_path(host, path):
-    p = os.path.abspath(path)
-    if host in mounts:
-        m = mounts[host]
-        local = m[0]
-        remote = m[1]
-        return p.replace(local, remote)
-    return p.replace(os.path.join(remote_dir, host), '')
-
-def get_remote_host(path):
-    p = os.path.abspath(path)
-    if p.startswith(remote_dir):
-        x = p.split('/')
-        return x[x.index('remote')+1]
-    for host in mounts:
-        m = mounts[host]
-        local = m[0]
-        if p.startswith(local):
-            return host
-
-def add_trail_slash(s):
-    if not s.endswith('/'):
-        return s + '/'
-    return s
-
-def remove_trail_slash(s):
-    if s.endswith('/'):
-        return s[:-1]
-    return s
-
-def remote_isdir(host, path):
-    return subprocess.run(['ssh', host, 'test -d {}'.format(shlex.quote(path))]).returncode == 0
-
-DRY_RUN=False
-
-def pipe_writeline(pipe, s):
-    if pipe:
-        pipe.write((s + "\n").encode('utf-8'))
-
-def rsync(src, dst, exclude=None, delete=False, shallow=False, **kwargs):
-    cmd = [shutil.which('rsync'), '--verbose', '--times', '--compress', '--progress']
-    if DRY_RUN:
-        cmd.append('--dry-run')
-    if delete:
-        cmd.append('--delete')
-        cmd.append('--delete-excluded')
-    if shallow:
-        cmd.append('--dirs')
-    else:
-        cmd.append('--recursive')
-    for e in exclude or []:
-        cmd.append('--exclude')
-        cmd.append(e)
-    isdir = os.path.isdir(src if ':' in dst else dst)
-    if isdir:
-        cmd.append(add_trail_slash(src))
-        cmd.append(remove_trail_slash(dst))
-    else:
-        cmd.append(src)
-        cmd.append(dst)
-    print(' '.join(cmd))
-    return subprocess.run(cmd, **kwargs).returncode
-
-exclude_sync = [
-    '.hg',
-    '.git',
-    '*build/',
-    'build*/',
-    '.tox',
-    '*.deb',
-    '*.rpm',
-    '.cache/'
-]
-
-def remote_sync(args, f, pipe=None):
-    parser = argparse.ArgumentParser()
-    parser.add_argument('file', help='file to sync with remote')
-    parser.add_argument('--delete', '-d', action='store_true', help='delete files missing')
-    parser.add_argument('--all', '-a', action='store_true', help='dont exclude any files')
-    parser.add_argument('--shallow', '-s', action='store_true', help='only sync current directory')
-    pargs = parser.parse_args(args)
-    local = pargs.file or os.getcwd()
-    host = get_remote_host(local)
-    if host in mounts:
-        return 0
-    remote_path = get_remote_path(host, local)
-    remote = '{}:{}'.format(host, remote_path)
-    # Make sure local directory exists
-    if not os.path.exists(local):
-        if remote_isdir(host, remote_path):
-            os.makedirs(local)
-        elif not os.path.exists(os.path.dirname(local)):
-            os.makedirs(os.path.dirname(local))
-    src, dst = f(local, remote)
-    exclude = not pargs.all if os.path.isdir(local) else False
-    return rsync(src, dst, exclude=exclude_sync if exclude else [], delete=pargs.delete, shallow=pargs.shallow, stdout=pipe, stderr=subprocess.STDOUT)
+@command
+def pull(args):
+    return remote.pull(args)
 
 @command
-def pull(args, pipe=None):
-    return remote_sync(args, lambda local, remote: (remote, local), pipe=pipe)
-
-@command
-def push(args, pipe=None):
-    return remote_sync(args, lambda local, remote: (local, remote), pipe=pipe)
+def push(args):
+    return remote.push(args)
 
 def create_connection_handler(hostname):
     class ConnectionHandler(socketserver.StreamRequestHandler):
@@ -152,7 +35,7 @@ def create_connection_handler(hostname):
 
         def get_local(self, path):
             if path.startswith('/'):
-                return get_local_path(self.hostname, path)
+                return remote.get_local_path(self.hostname, path)
             return path
 
         def writeline(self, s):
@@ -162,17 +45,17 @@ def create_connection_handler(hostname):
         def command_open(self, args):
             f = self.get_local(args[0])
             cmd = [shutil.which('subl')]
-            synced = self.hostname in mounts
+            synced = not remote.needs_sync(self.hostname)
             # If it doesnt exists then sync it first
             if not os.path.exists(f):
                 synced = True
-                pull([f], pipe=self.wfile)
+                remote.pull([f], pipe=self.wfile)
             # Create new window if its a directory
             if os.path.isdir(f):
                 cmd.append('-n')
             elif not synced:
                 # If its a file then sync it before opening
-                pull([f], pipe=self.wfile)
+                remote.pull([f], pipe=self.wfile)
             cmd.append(f)
             self.writeline(' '.join(cmd))
             return subprocess.Popen(cmd, stdout=self.wfile, stderr=self.wfile)
@@ -182,11 +65,11 @@ def create_connection_handler(hostname):
 
         def command_pull(self, args):
             largs = self.get_local_args(args)
-            push(largs, pipe=self.wfile)
+            remote.push(largs, pipe=self.wfile)
 
         def command_push(self, args):
             largs = self.get_local_args(args)
-            pull(largs, pipe=self.wfile)
+            remote.pull(largs, pipe=self.wfile)
 
     return ConnectionHandler
 
@@ -208,7 +91,8 @@ def connect_et(host, no_terminal=False):
         result.append('-x')
     else:
         result.append('-c')
-        result.append(' '.join(bash_command()))
+        # Add a space so the command is not added to bash history
+        result.append(' ' + ' '.join(bash_command()))
     result.append(host)
     return result
 
@@ -246,7 +130,7 @@ def mosh(args):
 
 @command
 def mount(args):
-    print(json.dumps(mounts))
+    print(json.dumps(remote.get_mounts()))
     return 0
 
 if __name__ == "__main__":
