@@ -50,6 +50,12 @@ def get_remote_host(path):
             return host
     return None
 
+def get_path_map(host):
+    if host in mounts:
+        return [os.path.join(remote_dir, host), '/']
+    return mounts[host]
+
+
 def needs_sync(host):
     return host and not host in mounts
 

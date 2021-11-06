@@ -4,16 +4,14 @@
     "log_payloads": true,
     "show_references_in_quick_panel": true,
     "clients": {
-      "paul-radeon4-clangd":
+      "rocm-clangd":
       {
         "command": 
         [
-          "ssh",
-          // "-tt",
-          "paul-radeon4",
+          "remote",
+          "clangd",
           "/opt/rocm/llvm/bin/clangd",
           "--log=verbose",
-          "--path-mappings=/Volumes/paul-radeon4=/home/paul",
           "--compile-commands-dir=build/",
           "--recovery-ast",
           "--header-insertion=never"
@@ -35,27 +33,26 @@
             "syntaxes": ["Packages/Objective-C/Objective-C++.sublime-syntax"],
             "languageId": "objective-cpp"
           },
-        ]
+        ],
+        "env": {
+          // Hardcode the path for dotfiles since sublime's python environment is broken
+          "PATH": "${home}/dotfiles/bin/"
+        }
       },
-      "fps9300-0-clangd":
+      "paul-radeon4-clangd":
       {
         "command": 
         [
           "ssh",
-          "-tt",
-          "fps9300-0",
-          // "/opt/rocm/hcc/bin/clangd",
-          // "/usr/local/bin/clangd",
+          // "-tt",
+          "paul-radeon4",
           "/opt/rocm/llvm/bin/clangd",
           "--log=verbose",
-          "--header-insertion=never" 
+          "--path-mappings=/Volumes/paul-radeon4=/home/paul",
+          "--compile-commands-dir=build/",
+          "--recovery-ast",
+          "--header-insertion=never"
         ],
-        // [
-        //   "et",
-        //   "fps9300-0",
-        //   "-c",
-        //   "/opt/rocm/llvm/bin/clangd --log=verbose --header-insertion=never"
-        // ],
         "languages": [{
             "scopes": ["source.c"],
             "syntaxes": ["Packages/C++/C.sublime-syntax"],

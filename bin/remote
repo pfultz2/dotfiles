@@ -133,6 +133,17 @@ def mount(args):
     print(json.dumps(remote.get_mounts()))
     return 0
 
+@command
+def clangd(args):
+    host = remote.get_remote_host(os.getcwd())
+    if host:
+        path_map = remote.get_path_map(host)
+        remote_run = ['ssh', host] + args + ['--path-mappings={}={}'.format(path_map[0], path_map[1])]
+        return subprocess.run(remote_run).returncode
+    else:
+        return subprocess.run(args).returncode
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1]
     r = __commands__[cmd](sys.argv[2:])
