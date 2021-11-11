@@ -34,6 +34,8 @@ if __name__ == "__main__":
     if os.environ.get('TERM_PROGRAM', '') == 'vscode':
         subprocess.run(tmcommand('code', args))
     elif 'SUBLIME_REMOTE_PORT' in os.environ and remote_matches(args.file) and not args.wait:
+        if not os.path.exists(args.file):
+            open(args.file, 'a').close()
         subprocess.run([shutil.which('dest'), 'open', args.file])
     elif 'RMATE_PORT' in os.environ and os.path.isfile(args.file):
         subprocess.run(tmcommand('rsubl', args))
