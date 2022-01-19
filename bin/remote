@@ -84,6 +84,9 @@ def start_server(host):
 def bash_command():
     return ['env', 'RMATE_PORT=52698', 'SUBLIME_REMOTE_PORT=52697', '$SHELL', '-il']
 
+def shell_wrap(commands):
+    return ['sh', '-c', ' '.join(commands)]
+
 def connect_et(host, no_terminal=False, local_port=52697):
     result = [shutil.which('et'), '-r', f'52697:{local_port},52698:52698']
     if no_terminal:
@@ -97,7 +100,7 @@ def connect_et(host, no_terminal=False, local_port=52697):
     return result
 
 def connect_mosh(host):
-    return [shutil.which('mosh'), '--', host] + bash_command()
+    return [shutil.which('mosh'), '--', host] + shell_wrap(bash_command())
 
 def connect_ssh(host, local_port=52697):
     return [shutil.which('ssh'), '-t', '-R', f'52697:localhost:{local_port}', '-R', '52698:localhost:52698', host] + bash_command()
