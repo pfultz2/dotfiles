@@ -15,30 +15,31 @@
           "--compile-commands-dir=build/",
           "--recovery-ast",
           "--header-insertion=never"
-        ],
+      ],
         "languages": [{
             "scopes": ["source.c"],
             "syntaxes": ["Packages/C++/C.sublime-syntax"],
-            "languageId": "c"
+            "languageId": "c",
           },{
             "scopes": ["source.c++"],
             "syntaxes": ["Packages/C++/C++.sublime-syntax"],
-            "languageId": "cpp"
+            "languageId": "cpp",
           },{
             "scopes": ["source.objc"],
             "syntaxes": ["Packages/Objective-C/Objective-C.sublime-syntax"],
-            "languageId": "objective-c"
+            "languageId": "objective-c",
           },{
             "scopes": ["source.objc++"],
             "syntaxes": ["Packages/Objective-C/Objective-C++.sublime-syntax"],
-            "languageId": "objective-cpp"
+            "languageId": "objective-cpp",
           },
-        ],
+      ],
         "env": {
           // Hardcode the path for dotfiles since sublime's python environment is broken
-          "PATH": "${home}/dotfiles/bin/"
-        }
-      },
+          "PATH": "${home}/dotfiles/bin/",
+        },
+      "enabled": true,
+    },
       "paul-radeon4-clangd":
       {
         "command": 
@@ -52,25 +53,25 @@
           "--compile-commands-dir=build/",
           "--recovery-ast",
           "--header-insertion=never"
-        ],
+      ],
         "languages": [{
             "scopes": ["source.c"],
             "syntaxes": ["Packages/C++/C.sublime-syntax"],
-            "languageId": "c"
+            "languageId": "c",
           },{
             "scopes": ["source.c++"],
             "syntaxes": ["Packages/C++/C++.sublime-syntax"],
-            "languageId": "cpp"
+            "languageId": "cpp",
           },{
             "scopes": ["source.objc"],
             "syntaxes": ["Packages/Objective-C/Objective-C.sublime-syntax"],
-            "languageId": "objective-c"
+            "languageId": "objective-c",
           },{
             "scopes": ["source.objc++"],
             "syntaxes": ["Packages/Objective-C/Objective-C++.sublime-syntax"],
-            "languageId": "objective-cpp"
+            "languageId": "objective-cpp",
           },
-        ]
+      ],
       },
       "fps9300-0-ccls":
       {
@@ -82,11 +83,11 @@
           "ccls",
           "-v=2",
           "--log-file=stderr"
-        ],
+      ],
         "initializationOptions": 
         {
-          "cache": {"directory": "/tmp/ccls-cache"},
-          "index": {"threads": 1}
+          "cache": {"directory": "/tmp/ccls-cache",},
+          "index": {"threads": 1,},
         },
         "languages":
         [
@@ -95,46 +96,46 @@
             "scopes":
             [
               "source.c"
-            ],
+          ],
             "syntaxes":
             [
               "Packages/C++/C.sublime-syntax"
-            ]
+          ],
           },
           {
             "languageId": "cpp",
             "scopes":
             [
               "source.c++"
-            ],
+          ],
             "syntaxes":
             [
               "Packages/C++/C++.sublime-syntax"
-            ]
+          ],
           },
           {
             "languageId": "objective-c",
             "scopes":
             [
               "source.objc"
-            ],
+          ],
             "syntaxes":
             [
               "Packages/Objective-C/Objective-C.sublime-syntax"
-            ]
+          ],
           },
           {
             "languageId": "objective-cpp",
             "scopes":
             [
               "source.objc++"
-            ],
+          ],
             "syntaxes":
             [
               "Packages/Objective-C/Objective-C++.sublime-syntax"
-            ]
+          ],
           }
-        ]
+      ],
       },
       "clangd":
       {
@@ -143,25 +144,25 @@
           "--clang-tidy",
           "--clang-tidy-checks='boost-*,bugprone-*,cert-*,clang-analyzer-*,clang-diagnostic-*,performance-*,readability-*'",
           "--header-insertion=never"
-        ],
+      ],
         "languages": [{
             "scopes": ["source.c"],
             "syntaxes": ["Packages/C++/C.sublime-syntax"],
-            "languageId": "c"
+            "languageId": "c",
           },{
             "scopes": ["source.c++"],
             "syntaxes": ["Packages/C++/C++.sublime-syntax"],
-            "languageId": "cpp"
+            "languageId": "cpp",
           },{
             "scopes": ["source.objc"],
             "syntaxes": ["Packages/Objective-C/Objective-C.sublime-syntax"],
-            "languageId": "objective-c"
+            "languageId": "objective-c",
           },{
             "scopes": ["source.objc++"],
             "syntaxes": ["Packages/Objective-C/Objective-C++.sublime-syntax"],
-            "languageId": "objective-cpp"
+            "languageId": "objective-cpp",
           },
-        ]
-      }
-    }
+      ],
+      },
+    },
 }

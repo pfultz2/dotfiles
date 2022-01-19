@@ -31,14 +31,16 @@
 	"copy_with_empty_selection": false,
 	"folder_exclude_patterns":
 	[
-		".svn",
+		"*build",
+		".cache",
 		".git",
 		".hg",
-		"CVS",
+		".pytest-cache",
+		".svn",
 		".tox",
 		"build",
-		"*build",
 		"cget",
+		"CVS",
 		"daca"
 	],
 	"font_options":
@@ -48,6 +50,7 @@
 	"ignored_packages":
 	[
 		"ClangComplete",
+		"LSP-yaml",
 		"Vintage",
 	],
 	"match_brackets_angle": true,
@@ -58,4 +61,6 @@
 	],
 	"translate_tabs_to_spaces": true,
 	"auto_complete": true,
+	"auto_complete_use_history": true,
+	"show_git_status": false,
 }
