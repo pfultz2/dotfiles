@@ -1,4 +1,4 @@
 {
 	"binary": "clang-format",
-	"style": "Custom",
+	"style": "File",
 }

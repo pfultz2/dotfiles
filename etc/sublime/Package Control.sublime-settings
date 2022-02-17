@@ -6,6 +6,7 @@
 	"installed_packages":
 	[
 		"Agila Theme",
+		"ANTLR syntax highlight",
 		"BetterSwitchHeaderImplementation",
 		"Case Conversion",
 		"Ciapre Color Scheme",
@@ -21,7 +22,6 @@
 		"INI",
 		"LLVM",
 		"LSP",
-		"LSP-bash",
 		"LSP-dockerfile",
 		"LSP-json",
 		"LSP-pyright",
@@ -29,6 +29,8 @@
 		"Markdown Table Formatter",
 		"Materialize",
 		"Package Control",
+		"Pretty JSON",
+		"Pretty YAML",
 		"Protobuf Syntax Hightlighting",
 		"PyYapf Python Formatter",
 		"RemoteSubl",
