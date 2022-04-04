@@ -42,8 +42,13 @@ def create_connection_handler(hostname):
             self.wfile.write(s.encode('utf-8'))
             self.wfile.write("\n".encode('utf-8'))
 
-        def command_open(self, args):
-            f = self.get_local(args[0])
+        def command_open(self, raw_args):
+            parser = argparse.ArgumentParser()
+            parser.add_argument('file', default=os.getcwd())
+            parser.add_argument('--line', '-l', default='0')
+            args = parser.parse_args(raw_args)
+
+            f = self.get_local(args.file)
             cmd = [shutil.which('subl')]
             synced = not remote.needs_sync(self.hostname)
             # If it doesnt exists then sync it first
@@ -56,7 +61,7 @@ def create_connection_handler(hostname):
             elif not synced:
                 # If its a file then sync it before opening
                 remote.pull([f], pipe=self.wfile)
-            cmd.append(f)
+            cmd.append(f + ':' + args.line)
             self.writeline(' '.join(cmd))
             return subprocess.Popen(cmd, stdout=self.wfile, stderr=self.wfile)
 

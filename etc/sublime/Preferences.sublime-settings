@@ -27,7 +27,7 @@
 		"*.so",
 		"*.dylib"
 	],
-	"color_scheme": "Packages/Color Scheme - Default/Mariana.sublime-color-scheme",
+	"color_scheme": "Mariana.sublime-color-scheme",
 	"copy_with_empty_selection": false,
 	"folder_exclude_patterns":
 	[
