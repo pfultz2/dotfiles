@@ -1,4 +1,4 @@
-import os, json, subprocess, shutil
+import argparse, shlex, os, json, subprocess, shutil
 
 DRY_RUN=False
 exclude_sync = [
