@@ -5,6 +5,7 @@ export DOTFILES=$( cd "$SCRIPT_DIR"/../.. && pwd )
 export PATH="$HOME/usr/bin:$HOME/.local/bin:$HOME/bin:$HOME/.cargo/bin:$DOTFILES/bin:/usr/local/bin:$PATH"
 
 export CMAKE_PREFIX_PATH="$HOME/usr/"
+export CTEST_OUTPUT_ON_FAILURE=1
 
 # OS variables
 [ $(uname -s) = "Darwin" ] && export OSX=1 && export UNIX=1
@@ -71,6 +72,7 @@ alias rr='remote-run.sh'
 alias cmake-ccache='cmake -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER_LAUNCHER=ccache'
 alias ssh-subl='ssh -R 52698:localhost:52698'
 alias et-subl='et -r 52698:52698'
+alias restart-pane='tmux respawn-pane -k'
 
 function mosh-subl {
     # stty -tostop
@@ -111,6 +113,8 @@ elif [[ $TERM_PROGRAM == vscode ]]; then
 fi
 touch $HISTFILE
 if type -p mcfly > /dev/null ; then
+    # Clear history file
+    rm "${MCFLY_HISTORY}"
     if [[ "$BASH_VERSION" ]]; then
         eval "$(mcfly init bash)"
     fi

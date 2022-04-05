@@ -48,6 +48,12 @@
 	"ignored_packages":
 	[
 		"ClangComplete",
+		"Evaluate",
+		"Hjson",
+		"LSP-json",
+		"Tabnine",
+		"Terminus",
+		"Tmux Syntax Highlight",
 		"Vintage",
 	],
 	"match_brackets_angle": true,

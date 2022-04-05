@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import argparse, shutil, subprocess, os, fnmatch
+import argparse, shutil, subprocess, os, fnmatch, re
 
 remote_match = [
     '~/*'
@@ -20,31 +20,62 @@ def flag(b, s):
     else:
         return []
 
-def tmcommand(name, args):
-    return [shutil.which(name)] + flag(args.wait, '-w') + flag(args.new_window or os.path.isdir(args.file), '-n') + [args.file]
+def get_line_number(s):
+    ints = re.findall('[0-9]+', s)
+    for x in ints:
+        return int(x)
+    return 0
+
+def parse_file(f):
+    try:
+        if not os.path.isfile(f) and ':' in f:
+            words = f.split(':')
+            if os.path.exists(words[0]):
+                return (words[0], get_line_number(words[1]))
+    except:
+        pass
+    return (f, 0)
+
+
+
+def tmcommand(name, args, f, line=None):
+    filename = f
+    if line:
+        filename = f + ':' + str(line)
+    return [shutil.which(name)] + flag(args.wait, '-w') + flag(args.new_window or os.path.isdir(f), '-n') + [filename]
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('file', help='file/folder to edit', default=os.getcwd(), nargs='?')
+    parser.add_argument('--tmux', action='store_true', help='Handles word from tmux')
     parser.add_argument('--new-window', '-n', action='store_true', help='Open a new window')
     parser.add_argument('--wait', '-w', action='store_true', help='Wait for the files to be closed before returning')
     args = parser.parse_args()
 
+    f, line = parse_file(args.file)
+
+    if args.tmux and (f.startswith('-') or not os.path.isfile(f)):
+        exit(0)
+
     if os.environ.get('TERM_PROGRAM', '') == 'vscode':
-        subprocess.run(tmcommand('code', args))
-    elif 'SUBLIME_REMOTE_PORT' in os.environ and remote_matches(args.file) and not args.wait:
-        if not os.path.exists(args.file):
-            open(args.file, 'a').close()
-        subprocess.run([shutil.which('dest'), 'open', args.file])
-    elif 'RMATE_PORT' in os.environ and os.path.isfile(args.file):
-        subprocess.run(tmcommand('rsubl', args))
+        if not os.path.exists(f):
+            open(f, 'a').close()
+        subprocess.run(tmcommand('code', args, f))
+    elif 'SUBLIME_REMOTE_PORT' in os.environ and remote_matches(f) and not args.wait:
+        if not os.path.exists(f):
+            open(f, 'a').close()
+        subprocess.run([shutil.which('dest'), 'open', f, '--line', str(line)])
+    elif 'RMATE_PORT' in os.environ and os.path.isfile(f):
+        subprocess.run(tmcommand('rsubl', args, f))
     elif 'DISPLAY' in os.environ and shutil.which('subl') and not os.environ.get('EDIT_DISABLE_GUI', False):
-        subprocess.run(tmcommand('subl', args))
-    elif shutil.which('nano') and os.path.isfile(args.file):
-        subprocess.run([shutil.which('nano'), args.file])
-    elif os.path.isfile(args.file):
-        subprocess.run([shutil.which('cat'), args.file])
-    elif os.path.isdir(args.file):
-        subprocess.run([shutil.which('ls'), args.file])
+        subprocess.run(tmcommand('subl', args, f, line))
+    elif args.tmux:
+        exit(0)
+    elif shutil.which('nano') and os.path.isfile(f):
+        subprocess.run([shutil.which('nano'), f])
+    elif os.path.isfile(f):
+        subprocess.run([shutil.which('cat'), f])
+    elif os.path.isdir(f):
+        subprocess.run([shutil.which('ls'), f])
 

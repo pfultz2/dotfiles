@@ -2,6 +2,12 @@
 	"bootstrapped": true,
 	"in_process_packages":
 	[
+		"Evaluate",
+		"Hjson",
+		"LSP-json",
+		"Tabnine",
+		"Terminus",
+		"Tmux Syntax Highlight",
 	],
 	"installed_packages":
 	[

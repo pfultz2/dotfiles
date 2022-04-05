@@ -16,5 +16,11 @@ else
     echo "source $DOTFILES/etc/bash/config" >> ~/.bashrc
 fi
 
+# TPM
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+
+# Facebook path picker
+git clone https://github.com/facebook/PathPicker.git $DOTFILES/pathpicker
+
 # Link files
 $DOTFILES/setup/link.sh
