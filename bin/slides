@@ -1,0 +1,110 @@
+#!/usr/bin/python3
+
+import os, sys, subprocess, shlex, shutil
+
+__commands__ = {}
+
+
+def command(f):
+    __commands__[f.__name__] = f
+    return f
+
+
+def run(args, **kwargs):
+    print(shlex.join(args))
+    return subprocess.run([shutil.which(args[0])] + args[1:],
+                          **kwargs).returncode
+
+
+def dst(f, ext):
+    return os.path.splitext(f)[0] + ext
+
+
+def convert_to_code_fences(filename, fence='```'):
+    output = []
+    with open(filename) as f:
+        incode = False
+        isempty = False
+        for line in f.readlines():
+            iscode = (isempty or incode) and line.startswith('    ')
+            isempty = not line.strip()
+            if incode:
+                if isempty:
+                    output.append(line)
+                elif iscode:
+                    output.append(line[4:])
+                else:
+                    output.append(fence)
+                    output.append('\n\n')
+                    output.append(line)
+                    incode = False
+            else:
+                if iscode:
+                    x = line[4:]
+                    if x.startswith('!'):
+                        output.append('{fence}{language}'.format(
+                            fence=fence, language=x[1:].strip()))
+                        output.append('\n')
+                    else:
+                        output.append(fence)
+                        output.append('\n')
+                        output.append(x)
+                    incode = True
+                else:
+                    output.append(line)
+    return ''.join(output).encode('utf-8')
+
+def prefix(s, p):
+    for x in s:
+        yield p
+        yield x
+
+def pandoc(input,
+           format=None,
+           to=None,
+           output=None,
+           highlight=None,
+           ext=None,
+           vars=None,
+           args=None):
+    run([
+        'pandoc', '--self-contained', '--highlight-style', highlight
+        or 'breezedark', '-f', format or 'markdown', '-t', to, '-o', output
+        or dst(input, ext or '.' + to)
+    ] + list(prefix(vars or [], '-V')) + (args or []),
+        input=convert_to_code_fences(input))
+
+
+@command
+def html(args):
+    run([
+        'darkslide', '-i', '--linenos=no', '--theme=abyss', args[0], '-d',
+        dst(args[0], '.html')
+    ])
+
+
+@command
+def pdf(args):
+    # run(['landslide', '-i', '--linenos=no', args[0], '-d', dst(args[0], '.pdf')])
+    pandoc(args[0], to='pdf', highlight='pygments', args=args[1:])
+
+
+@command
+def revealjs(args):
+    pandoc(args[0], to='revealjs', ext='.html', vars=['fontsize=9pt'])
+
+
+@command
+def slidy(args):
+    pandoc(args[0], to='slidy', ext='.html', highlight='pygments')
+
+
+@command
+def pptx(args):
+    pandoc(args[0], to='pptx', highlight='pygments', args=args[1:])
+
+
+if __name__ == "__main__":
+    cmd = sys.argv[1]
+    r = __commands__[cmd](sys.argv[2:])
+    exit(r)
