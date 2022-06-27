@@ -49,7 +49,7 @@ def create_connection_handler(hostname):
             args = parser.parse_args(raw_args)
 
             f = self.get_local(args.file)
-            cmd = [shutil.which('subl')]
+            cmd = [shutil.which('edit')]
             synced = not remote.needs_sync(self.hostname)
             # If it doesnt exists then sync it first
             if not os.path.exists(f):
