@@ -16,7 +16,7 @@ if [ -d /tmp/.X11-unix ]; then
 fi
 
 ls /dev/kfd && DOCKER_OPTIONS+=(--device='/dev/kfd')
-ls /dev/dri && DOCKER_OPTIONS+=(--device='/dev/dri' --group-add video)
+ls /dev/dri && DOCKER_OPTIONS+=(--device='/dev/dri' --group-add video --group-add $(getent group render | cut -d':' -f 3))
 
 # if [ "$DOCKER_MINOR_VERSION" -lt "11" ]; then
 #     DNS_SERVERS=$((nmcli dev list || nmcli dev show) 2> /dev/null | grep DNS | sed 's/\s\s*/\t/g' | cut -f 2)
@@ -39,6 +39,7 @@ if [[ ! -z "$RMATE_PORT" ]]; then
     DOCKER_OPTIONS+=(-e "RMATE_PORT=$RMATE_PORT")
 fi
 DOCKER_OPTIONS+=(-v="$HOME/.ssh:$DOCKER_HOME/.ssh")
+mkdir -p $HOME/.ccache
 DOCKER_OPTIONS+=(-v="$HOME/.ccache:/ccache")
 DOCKER_OPTIONS+=(-v="$CURRENT_HISTFILE:/.bash_history" -e HISTFILE=/.bash_history)
 DOCKER_OPTIONS+=(--cap-add SYS_PTRACE)
