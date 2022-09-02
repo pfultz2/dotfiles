@@ -186,6 +186,15 @@ def ret(args):
     return r
 
 @command
+def rmosh(args):
+    host = args[0]
+    etp = run_async(connect_et(host, no_terminal=True))
+    print(' '.join(connect_mosh(host)))
+    cp = run(connect_mosh(host))
+    etp.kill()
+    return cp.returncode
+
+@command
 def mount(args):
     print(json.dumps(remote.get_mounts()))
     return 0
