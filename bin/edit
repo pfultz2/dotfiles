@@ -7,6 +7,8 @@ remote_match = [
 ]
 
 def remote_matches(f):
+    if f == '-':
+        return False
     fullpath = os.path.abspath(f)
     for pattern in remote_match:
         p = os.path.expanduser(pattern)
@@ -26,12 +28,24 @@ def get_line_number(s):
         return int(x)
     return 0
 
+def get_path(f):
+    if os.path.exists(f):
+        return f
+    elif not f.startswith('..'):
+        return get_path(os.path.join('..', f))
+    else:
+        return None
+
 def parse_file(f):
+    if not os.path.isfile(f) and f.startswith('"'):
+        return parse_file(f[1:])
     try:
         if not os.path.isfile(f) and ':' in f:
             words = f.split(':')
-            if os.path.exists(words[0]):
-                return (words[0], get_line_number(words[1]))
+            p = get_path(words[0])
+            print("path", p)
+            if p:
+                return (p, get_line_number(words[1]))
     except:
         pass
     return (f, 0)
@@ -66,7 +80,7 @@ if __name__ == "__main__":
         if not os.path.exists(f):
             open(f, 'a').close()
         subprocess.run([shutil.which('dest'), 'open', f, '--line', str(line)])
-    elif 'RMATE_PORT' in os.environ and os.path.isfile(f):
+    elif 'RMATE_PORT' in os.environ and (os.path.isfile(f) or f == '-'):
         subprocess.run(tmcommand('rsubl', args, f))
     elif 'DISPLAY' in os.environ and shutil.which('subl') and not os.environ.get('EDIT_DISABLE_GUI', False):
         subprocess.run(tmcommand('subl', args, f, line))
