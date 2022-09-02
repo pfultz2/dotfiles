@@ -35,6 +35,9 @@ DOCKER_OPTIONS+=(--network 'host' --userns 'host')
 USERNAME=$(id -nu)
 DOCKER_HOME=/home/$USERNAME
 # DOCKER_OPTIONS+=(-p 52698:52698)
+if [[ ! -z "$RMATE_PORT" ]]; then
+    DOCKER_OPTIONS+=(-e "RMATE_PORT=$RMATE_PORT")
+fi
 DOCKER_OPTIONS+=(-v="$HOME/.ssh:$DOCKER_HOME/.ssh")
 DOCKER_OPTIONS+=(-v="$HOME/.ccache:/ccache")
 DOCKER_OPTIONS+=(-v="$CURRENT_HISTFILE:/.bash_history" -e HISTFILE=/.bash_history)

@@ -2,18 +2,13 @@
 	"bootstrapped": true,
 	"in_process_packages":
 	[
-		"Evaluate",
-		"Hjson",
-		"LSP-json",
-		"Tabnine",
-		"Terminus",
-		"Tmux Syntax Highlight",
 	],
 	"installed_packages":
 	[
 		"Agila Theme",
 		"ANTLR syntax highlight",
 		"BetterSwitchHeaderImplementation",
+		"Calculate",
 		"Case Conversion",
 		"Ciapre Color Scheme",
 		"Clang Format",
