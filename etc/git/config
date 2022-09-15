@@ -14,8 +14,6 @@
     added = green bold
     changed = yellow bold
     untracked = red bold
-[push]
-    default = simple
 [user]
     name = Paul
     email = pfultz2@yahoo.com
@@ -37,6 +35,11 @@
     serve = !git daemon --reuseaddr --verbose  --base-path=. --export-all ./.git
     gh = !git clone git@github.com:$1.git
     undo = reset --soft HEAD~1
+    branch-name = "symbolic-ref --short HEAD"  # https://stackoverflow.com/a/19585361/5353461
+    branch-remote-fetch = !"branch=$(git branch-name \"$1\") && git config branch.\"$branch\".remote || echo origin #"
+    branch-remote-push  = !"branch=$(git branch-name \"$1\") && git config branch.\"$branch\".pushRemote || git config remote.pushDefault || git branch-remote-fetch #"
+    set-upstream = !git branch --set-upstream-to=origin/`git symbolic-ref --short HEAD`
+    u = !git branch --set-upstream-to=origin/`git symbolic-ref --short HEAD`
 [push]
     default = current
 [filter "lfs"]

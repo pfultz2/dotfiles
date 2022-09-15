@@ -134,6 +134,15 @@ function map() {
   xargs -n1 "$@"
 }
 
+function fe() {
+  input=$(find "${1:-.}" -type f | fzy -l 25)
+  (( $? == 0 )) && edit $input
+}
+
+function fcd() {
+  input=$(find "${1:-.}" -type d | fzy -l 25)
+  (( $? == 0 )) && cd $input
+}
 
 # Use Git’s colored diff when available
 hash git &>/dev/null;
