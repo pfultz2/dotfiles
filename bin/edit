@@ -82,6 +82,8 @@ if __name__ == "__main__":
         subprocess.run([shutil.which('dest'), 'open', f, '--line', str(line)])
     elif 'RMATE_PORT' in os.environ and (os.path.isfile(f) or f == '-'):
         subprocess.run(tmcommand('rsubl', args, f))
+    elif 'WSL' in os.environ and shutil.which('subl.exe') and not os.environ.get('EDIT_DISABLE_GUI', False):
+        subprocess.run(tmcommand('subl.exe', args, f, line))
     elif 'DISPLAY' in os.environ and shutil.which('subl') and not os.environ.get('EDIT_DISABLE_GUI', False):
         subprocess.run(tmcommand('subl', args, f, line))
     elif args.tmux:
