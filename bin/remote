@@ -5,6 +5,9 @@ __py_dir__ = os.path.normpath(os.path.join(os.path.realpath(__file__), '..', '..
 sys.path.append(__py_dir__)
 import remote
 
+DEFAULT_RMATE_PORT=52699
+SUBLIME_LOCAL_RMATE_PORT=52698
+
 __commands__ = {}
 def command(f):
     __commands__[f.__name__] = f
@@ -99,18 +102,18 @@ def rformat(s, *args, **kwargs):
     return s.format(*args, **kwargs)
 
 
-def bash_command(remote_port=None, rmate_port=52698):
+def bash_command(remote_port=None, rmate_port=None):
     return rempty([
         'env',
-        rformat('RMATE_PORT={}', rmate_port),
+        rformat('RMATE_PORT={}', rmate_port or DEFAULT_RMATE_PORT),
         rformat('SUBLIME_REMOTE_PORT={}', remote_port), '$SHELL', '-il'
     ])
 
 def shell_wrap(commands):
     return ['sh', '-c', ' '.join(commands)]
 
-def connect_et(host, no_terminal=False, local_port=None, remote_port=None, **kwargs):
-    ports = rempty([rformat('{}:{}', remote_port, local_port), '52698:52698'])
+def connect_et(host, no_terminal=False, local_port=None, remote_port=None, rmate_port=DEFAULT_RMATE_PORT, **kwargs):
+    ports = rempty([rformat('{}:{}', remote_port, local_port), f'{rmate_port}:{SUBLIME_LOCAL_RMATE_PORT}'])
     print(ports)
     result = [shutil.which('et'), '-r', ','.join(ports)]
     if no_terminal:
@@ -119,18 +122,18 @@ def connect_et(host, no_terminal=False, local_port=None, remote_port=None, **kwa
     else:
         result.append('-c')
         # Add a space so the command is not added to bash history
-        result.append(' ' + ' '.join(bash_command(remote_port=remote_port, **kwargs)))
+        result.append(' ' + ' '.join(bash_command(remote_port=remote_port, rmate_port=rmate_port, **kwargs)))
     result.append(host)
     return result
 
 def connect_mosh(host, **kwargs):
     return [shutil.which('mosh'), '--', host] + shell_wrap(bash_command(**kwargs))
 
-def connect_ssh(host, local_port=None, remote_port=None, **kwargs):
+def connect_ssh(host, local_port=None, remote_port=None, rmate_port=DEFAULT_RMATE_PORT, **kwargs):
     return rempty([
         shutil.which('ssh'), '-t', rformat('-R', local_port, remote_port),
-        rformat('{}:localhost:{}', '52697', remote_port, local_port), '-R', '52698:localhost:52698', host
-    ] + bash_command(remote_port=remote_port, **kwargs))
+        rformat('{}:localhost:{}', '52697', remote_port, local_port), '-R', f'{rmate_port}:localhost:{SUBLIME_LOCAL_RMATE_PORT}', host
+    ] + bash_command(remote_port=remote_port, rmate_port=rmate_port, **kwargs))
 
 
 def show_command(cmd):
@@ -144,53 +147,61 @@ def run_async(cmd, *args, **kwargs):
     show_command(cmd)
     return subprocess.Popen(cmd, *args, **kwargs)
 
+def parse_connect_args(args):   
+    ap = argparse.ArgumentParser(args)
+    ap.add_argument('host')
+    ap.add_argument('--rmate-port', '-m', default=DEFAULT_RMATE_PORT)
+    return ap.parse_args(args)
+
 @command
-def et(args):
-    host = args[0]
-    server = start_server(host)
+def et(_args):
+    args = parse_connect_args(_args)
+    server = start_server(args.host)
     print('port', server.server_address[1])
-    r = run(connect_et(host, local_port=server.server_address[1], remote_port=52697)).returncode
+    r = run(connect_et(args.host, local_port=server.server_address[1], remote_port=52697, rmate_port=args.rmate_port)).returncode
     server.shutdown()
     return r
 
 @command
-def ssh(args):
-    host = args[0]
-    server = start_server(host)
-    r = run(connect_ssh(host, local_port=server.server_address[1], remote_port=52697)).returncode
+def ssh(_args):
+    args = parse_connect_args(_args)
+    server = start_server(args.host)
+    r = run(connect_ssh(args.host, local_port=server.server_address[1], remote_port=52697, rmate_port=args.rmate_port)).returncode
     server.shutdown()
     return r
 
 
 @command
-def mosh(args):
-    host = args[0]
-    server = start_server(host)
-    etp = run_async(connect_et(host, no_terminal=True, local_port=server.server_address[1]))
-    print(' '.join(connect_mosh(host)))
-    cp = run(connect_mosh(host))
+def mosh(_args):
+    args = parse_connect_args(_args)
+    server = start_server(args.host)
+    etp = run_async(connect_et(args.host, no_terminal=True, local_port=server.server_address[1], rmate_port=args.rmate_port))
+    mosh_cmd = connect_mosh(args.host, rmate_port=args.rmate_port)
+    print(' '.join(mosh_cmd))
+    cp = run(mosh_cmd)
     server.shutdown()
     etp.kill()
     return cp.returncode
 
 @command
-def rssh(args):
-    host = args[0]
-    r = run(connect_ssh(host)).returncode
+def rssh(_args):
+    args = parse_connect_args(_args)
+    r = run(connect_ssh(args.host, rmate_port=args.rmate_port)).returncode
     return r
 
 @command
-def ret(args):
-    host = args[0]
-    r = run(connect_et(host)).returncode
+def ret(_args):
+    args = parse_connect_args(_args)
+    r = run(connect_et(args.host, rmate_port=args.rmate_port)).returncode
     return r
 
 @command
-def rmosh(args):
-    host = args[0]
-    etp = run_async(connect_et(host, no_terminal=True))
-    print(' '.join(connect_mosh(host)))
-    cp = run(connect_mosh(host))
+def rmosh(_args):
+    args = parse_connect_args(_args)
+    etp = run_async(connect_et(args.host, no_terminal=True, rmate_port=args.rmate_port))
+    mosh_cmd = connect_mosh(args.host, rmate_port=args.rmate_port)
+    print(' '.join(mosh_cmd))
+    cp = run(mosh_cmd)
     etp.kill()
     return cp.returncode
 

@@ -27,6 +27,8 @@ ulimit -c unlimited
 # Use --user by default for pip
 PIP_USER=1
 
+export SSL_CERT_DIR=/etc/ssl/certs
+
 alias gnome-control-center='env XDG_CURRENT_DESKTOP=GNOME gnome-control-center'
 
 # set dbus for remote SSH connections
