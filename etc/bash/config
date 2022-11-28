@@ -12,6 +12,8 @@ export CTEST_OUTPUT_ON_FAILURE=1
 [ $(uname -s) = "Linux" ] && export LINUX=1 && export UNIX=1
 uname -s | grep -q "_NT-" && export WINDOWS=1
 
+[[ $(grep -i microsoft /proc/version) ]] && export WSL=1
+
 # Fix systems missing $USER
 [ -z "$USER" ] && export USER=$(whoami)
 
