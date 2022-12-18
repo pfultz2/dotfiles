@@ -72,7 +72,9 @@ if __name__ == "__main__":
     if args.tmux and (f.startswith('-') or not os.path.isfile(f)):
         exit(0)
 
-    if os.environ.get('TERM_PROGRAM', '') == 'vscode':
+    if shutil.which('lapce'):
+        subprocess.run([shutil.which('lapce'), f])
+    elif os.environ.get('TERM_PROGRAM', '') == 'vscode':
         if not os.path.exists(f):
             open(f, 'a').close()
         subprocess.run(tmcommand('code', args, f))
