@@ -1,17 +1,17 @@
 <snippet>
     <content><![CDATA[
 #ifndef $1
-#define ${1:MIGRAPHX_GUARD_${TM_FILEPATH/^.*\/([^\/]+)\/[^\/]+$/\U$1\E/}_${TM_FILENAME/(([A-Z])([A-Z][a-z]))|(([a-z])([A-Z]))|([a-z])|(\.)/\U(?1:$2_$3)(?4:$5_$6)$7(?8:_)\E/g}}
+#define ${1:ROCM_GUARD_${TM_FILEPATH/^.*\/([^\/]+)\/[^\/]+$/\U$1\E/}_${TM_FILENAME/(([A-Z])([A-Z][a-z]))|(([a-z])([A-Z]))|([a-z])|(\.)/\U(?1:$2_$3)(?4:$5_$6)$7(?8:_)\E/g}}
 
-#include <migraphx/config.hpp>
+#include <rocm/config.hpp>
 
-namespace migraphx {
-inline namespace MIGRAPHX_INLINE_NS {
+namespace rocm {
+inline namespace ROCM_INLINE_NS {
 
 ${0:$SELECTION}
 
-} // namespace MIGRAPHX_INLINE_NS
-} // namespace migraphx
+} // namespace ROCM_INLINE_NS
+} // namespace rocm
 #endif // $1
 
 ]]></content>
