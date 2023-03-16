@@ -3,7 +3,7 @@
 #ifndef $1
 #define ${1:ROCM_GUARD_${TM_FILEPATH/^.*\/([^\/]+)\/[^\/]+$/\U$1\E/}_${TM_FILENAME/(([A-Z])([A-Z][a-z]))|(([a-z])([A-Z]))|([a-z])|(\.)/\U(?1:$2_$3)(?4:$5_$6)$7(?8:_)\E/g}}
 
-#include <rocm/config.hpp>
+#include <rocm/common/config.hpp>
 
 namespace rocm {
 inline namespace ROCM_INLINE_NS {
