@@ -61,6 +61,8 @@ alias vg='valgrind --track-origins=yes --read-var-info=yes --read-inline-info=ye
 
 alias m="CTEST_PARALLEL_LEVEL=${CPUCOUNT} make -j${CPUCOUNT}"
 
+alias rs='rsync -avz --partial --progress --inplace'
+
 # Pretty print the path
 alias path='echo $PATH | tr -s ":" "\n"'
 
