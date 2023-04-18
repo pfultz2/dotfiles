@@ -79,6 +79,13 @@ def create_connection_handler(hostname):
             largs = self.get_local_args(args)
             remote.pull(largs, pipe=self.wfile)
 
+        def command_firefox(self, args):
+            largs = self.get_local_args(args)
+            cmd = ['open', '-a', 'firefox'] if sys.platform == "darwin" else [shutil.which('firefox')]
+            cmd += largs
+            self.writeline(shlex.join(cmd))
+            return subprocess.Popen(cmd, stdout=self.wfile, stderr=self.wfile)
+
     return ConnectionHandler
 
 class TCPServer(socketserver.ThreadingTCPServer):
