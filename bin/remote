@@ -6,6 +6,7 @@ sys.path.append(__py_dir__)
 import remote
 
 DEFAULT_RMATE_PORT=52699
+DEFAULT_REMOTE_PORT=52697
 SUBLIME_LOCAL_RMATE_PORT=52698
 
 __commands__ = {}
@@ -138,8 +139,9 @@ def connect_mosh(host, **kwargs):
 
 def connect_ssh(host, local_port=None, remote_port=None, rmate_port=DEFAULT_RMATE_PORT, **kwargs):
     return rempty([
-        shutil.which('ssh'), '-t', rformat('-R', local_port, remote_port),
-        rformat('{}:localhost:{}', '52697', remote_port, local_port), '-R', f'{rmate_port}:localhost:{SUBLIME_LOCAL_RMATE_PORT}', host
+        shutil.which('ssh'), '-t',
+        '-R', rformat('{}:localhost:{}', remote_port, local_port),
+        '-R', f'{rmate_port}:localhost:{SUBLIME_LOCAL_RMATE_PORT}', host
     ] + bash_command(remote_port=remote_port, rmate_port=rmate_port, **kwargs))
 
 
@@ -158,6 +160,7 @@ def parse_connect_args(args):
     ap = argparse.ArgumentParser(args)
     ap.add_argument('host')
     ap.add_argument('--rmate-port', '-m', default=DEFAULT_RMATE_PORT)
+    ap.add_argument('--remote-port', '-p', default=DEFAULT_REMOTE_PORT)
     return ap.parse_args(args)
 
 @command
@@ -165,7 +168,7 @@ def et(_args):
     args = parse_connect_args(_args)
     server = start_server(args.host)
     print('port', server.server_address[1])
-    r = run(connect_et(args.host, local_port=server.server_address[1], remote_port=52697, rmate_port=args.rmate_port)).returncode
+    r = run(connect_et(args.host, local_port=server.server_address[1], remote_port=args.remote_port, rmate_port=args.rmate_port)).returncode
     server.shutdown()
     return r
 
@@ -173,7 +176,8 @@ def et(_args):
 def ssh(_args):
     args = parse_connect_args(_args)
     server = start_server(args.host)
-    r = run(connect_ssh(args.host, local_port=server.server_address[1], remote_port=52697, rmate_port=args.rmate_port)).returncode
+    print('port', server.server_address[1])
+    r = run(connect_ssh(args.host, local_port=server.server_address[1], remote_port=args.remote_port, rmate_port=args.rmate_port)).returncode
     server.shutdown()
     return r
 
@@ -182,7 +186,7 @@ def ssh(_args):
 def mosh(_args):
     args = parse_connect_args(_args)
     server = start_server(args.host)
-    etp = run_async(connect_et(args.host, no_terminal=True, local_port=server.server_address[1], rmate_port=args.rmate_port))
+    etp = run_async(connect_et(args.host, no_terminal=True, local_port=server.server_address[1], remote_port=args.remote_port, rmate_port=args.rmate_port))
     mosh_cmd = connect_mosh(args.host, rmate_port=args.rmate_port)
     print(' '.join(mosh_cmd))
     cp = run(mosh_cmd)
