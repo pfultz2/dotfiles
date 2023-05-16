@@ -50,6 +50,7 @@
 	"ignored_packages":
 	[
 		"ClangComplete",
+		"LSP-pyright",
 		"LSP-yaml",
 		"Vintage",
 	],
