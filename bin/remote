@@ -109,9 +109,11 @@ def rformat(s, *args, **kwargs):
             return None
     return s.format(*args, **kwargs)
 
-
-def bash_command(remote_port=None, rmate_port=None):
-    return rempty([
+def bash_command(remote_port=None, rmate_port=None, cwd=None):
+    cd = []
+    if cwd:
+        cd = ['cd', cwd, ';']
+    return cd + rempty([
         'env',
         rformat('RMATE_PORT={}', rmate_port or DEFAULT_RMATE_PORT),
         rformat('SUBLIME_REMOTE_PORT={}', remote_port), '$SHELL', '-il'
@@ -158,9 +160,14 @@ def run_async(cmd, *args, **kwargs):
 
 def parse_connect_args(args):   
     ap = argparse.ArgumentParser(args)
-    ap.add_argument('host')
+    path = None
+    host = remote.get_remote_host(os.getcwd())
+    if host:
+        path = remote.get_remote_path(host, os.getcwd())
+    ap.add_argument('host', nargs='?', default=host)
     ap.add_argument('--rmate-port', '-m', default=DEFAULT_RMATE_PORT)
     ap.add_argument('--remote-port', '-p', default=DEFAULT_REMOTE_PORT)
+    ap.add_argument('--directory', '-d', default=path)
     return ap.parse_args(args)
 
 @command
@@ -168,7 +175,7 @@ def et(_args):
     args = parse_connect_args(_args)
     server = start_server(args.host)
     print('port', server.server_address[1])
-    r = run(connect_et(args.host, local_port=server.server_address[1], remote_port=args.remote_port, rmate_port=args.rmate_port)).returncode
+    r = run(connect_et(args.host, local_port=server.server_address[1], remote_port=args.remote_port, rmate_port=args.rmate_port, cwd=args.directory)).returncode
     server.shutdown()
     return r
 
@@ -177,7 +184,7 @@ def ssh(_args):
     args = parse_connect_args(_args)
     server = start_server(args.host)
     print('port', server.server_address[1])
-    r = run(connect_ssh(args.host, local_port=server.server_address[1], remote_port=args.remote_port, rmate_port=args.rmate_port)).returncode
+    r = run(connect_ssh(args.host, local_port=server.server_address[1], remote_port=args.remote_port, rmate_port=args.rmate_port, cwd=args.directory)).returncode
     server.shutdown()
     return r
 
@@ -187,7 +194,7 @@ def mosh(_args):
     args = parse_connect_args(_args)
     server = start_server(args.host)
     etp = run_async(connect_et(args.host, no_terminal=True, local_port=server.server_address[1], remote_port=args.remote_port, rmate_port=args.rmate_port))
-    mosh_cmd = connect_mosh(args.host, rmate_port=args.rmate_port)
+    mosh_cmd = connect_mosh(args.host, rmate_port=args.rmate_port, cwd=args.directory)
     print(' '.join(mosh_cmd))
     cp = run(mosh_cmd)
     server.shutdown()
