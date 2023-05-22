@@ -9,6 +9,32 @@ exclude_sync = [
     '.tox',
     '*.deb',
     '*.rpm',
+    "*.a1",
+    "*.a2",
+    "*.a4",
+    "*.a5",
+    "*.jpg",
+    "*.jpeg",
+    "*.png",
+    "*.gif",
+    "*.ttf",
+    "*.tga",
+    "*.dds",
+    "*.ico",
+    "*.eot",
+    "*.pdf",
+    "*.swf",
+    "*.jar",
+    "*.zip",
+    "*.dll",
+    "*.obj",
+    "*.o",
+    "*.a",
+    "*.lib",
+    "*.so",
+    "*.so.*",
+    "*.dylib",
+    "*.onnx",
     '.cache/'
 ]
 remote_dir = os.path.expanduser('~/remote')
@@ -52,8 +78,10 @@ def get_remote_host(path):
 
 def get_path_map(host):
     if host in mounts:
-        return mounts[host]
-    return [os.path.join(remote_dir, host), '/']
+        return [mounts[host]]
+    # clangd usually doesnt handle using the root / directory
+    paths = ['/home', '/usr', '/opt']
+    return [[get_local_path(host, path), path] for path in paths]
 
 
 def needs_sync(host):

@@ -140,9 +140,12 @@ def connect_mosh(host, **kwargs):
     return [shutil.which('mosh'), '--', host] + shell_wrap(bash_command(**kwargs))
 
 def connect_ssh(host, local_port=None, remote_port=None, rmate_port=DEFAULT_RMATE_PORT, **kwargs):
+    sublime_port_forward = []
+    if local_port and remote_port:
+        sublime_port_forward = ['-R', f'{remote_port}:localhost:{local_port}']
     return rempty([
         shutil.which('ssh'), '-t',
-        '-R', rformat('{}:localhost:{}', remote_port, local_port),
+        *sublime_port_forward,
         '-R', f'{rmate_port}:localhost:{SUBLIME_LOCAL_RMATE_PORT}', host
     ] + bash_command(remote_port=remote_port, rmate_port=rmate_port, **kwargs))
 
@@ -233,7 +236,8 @@ def clangd(args):
     host = remote.get_remote_host(os.getcwd())
     if host:
         path_map = remote.get_path_map(host)
-        remote_run = ['ssh', host] + args + ['--path-mappings={}={}'.format(path_map[0], path_map[1])]
+        mappings = ','.join(["{}={}".format(m[0], m[1]) for m in path_map])
+        remote_run = ['ssh', host] + args + ['--path-mappings={}'.format(mappings)]
         return run(remote_run).returncode
     else:
         return run(args).returncode
