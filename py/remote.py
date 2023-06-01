@@ -125,7 +125,7 @@ def rsync(src, dst, exclude=None, delete=False, shallow=False, **kwargs):
     else:
         cmd.append(src)
         cmd.append(dst)
-    print(' '.join(cmd))
+    # print(' '.join(cmd))
     return subprocess.run(cmd, **kwargs).returncode
 
 def remote_sync(args, f, pipe=None):
