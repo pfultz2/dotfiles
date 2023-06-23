@@ -6,6 +6,7 @@
 		"*.a2",
 		"*.a4",
 		"*.a5",
+		".coverage*",
 		"*.jpg",
 		"*.jpeg",
 		"*.png",
@@ -50,8 +51,6 @@
 	"ignored_packages":
 	[
 		"ClangComplete",
-		"LSP-pyright",
-		"LSP-yaml",
 		"Vintage",
 	],
 	"match_brackets_angle": true,
