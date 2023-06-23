@@ -6,6 +6,7 @@ sys.path.append(__py_dir__)
 import remote
 
 DEFAULT_RMATE_PORT=52699
+DEFAULT_REMOTE_PORT=52697
 SUBLIME_LOCAL_RMATE_PORT=52698
 
 __commands__ = {}
@@ -108,9 +109,11 @@ def rformat(s, *args, **kwargs):
             return None
     return s.format(*args, **kwargs)
 
-
-def bash_command(remote_port=None, rmate_port=None):
-    return rempty([
+def bash_command(remote_port=None, rmate_port=None, cwd=None):
+    cd = []
+    if cwd:
+        cd = ['cd', cwd, ';']
+    return cd + rempty([
         'env',
         rformat('RMATE_PORT={}', rmate_port or DEFAULT_RMATE_PORT),
         rformat('SUBLIME_REMOTE_PORT={}', remote_port), '$SHELL', '-il'
@@ -137,9 +140,13 @@ def connect_mosh(host, **kwargs):
     return [shutil.which('mosh'), '--', host] + shell_wrap(bash_command(**kwargs))
 
 def connect_ssh(host, local_port=None, remote_port=None, rmate_port=DEFAULT_RMATE_PORT, **kwargs):
+    sublime_port_forward = []
+    if local_port and remote_port:
+        sublime_port_forward = ['-R', f'{remote_port}:localhost:{local_port}']
     return rempty([
-        shutil.which('ssh'), '-t', rformat('-R', local_port, remote_port),
-        rformat('{}:localhost:{}', '52697', remote_port, local_port), '-R', f'{rmate_port}:localhost:{SUBLIME_LOCAL_RMATE_PORT}', host
+        shutil.which('ssh'), '-t',
+        *sublime_port_forward,
+        '-R', f'{rmate_port}:localhost:{SUBLIME_LOCAL_RMATE_PORT}', host
     ] + bash_command(remote_port=remote_port, rmate_port=rmate_port, **kwargs))
 
 
@@ -156,8 +163,14 @@ def run_async(cmd, *args, **kwargs):
 
 def parse_connect_args(args):   
     ap = argparse.ArgumentParser(args)
-    ap.add_argument('host')
+    path = None
+    host = remote.get_remote_host(os.getcwd())
+    if host:
+        path = remote.get_remote_path(host, os.getcwd())
+    ap.add_argument('host', nargs='?', default=host)
     ap.add_argument('--rmate-port', '-m', default=DEFAULT_RMATE_PORT)
+    ap.add_argument('--remote-port', '-p', default=DEFAULT_REMOTE_PORT)
+    ap.add_argument('--directory', '-d', default=path)
     return ap.parse_args(args)
 
 @command
@@ -165,7 +178,7 @@ def et(_args):
     args = parse_connect_args(_args)
     server = start_server(args.host)
     print('port', server.server_address[1])
-    r = run(connect_et(args.host, local_port=server.server_address[1], remote_port=52697, rmate_port=args.rmate_port)).returncode
+    r = run(connect_et(args.host, local_port=server.server_address[1], remote_port=args.remote_port, rmate_port=args.rmate_port, cwd=args.directory)).returncode
     server.shutdown()
     return r
 
@@ -173,7 +186,8 @@ def et(_args):
 def ssh(_args):
     args = parse_connect_args(_args)
     server = start_server(args.host)
-    r = run(connect_ssh(args.host, local_port=server.server_address[1], remote_port=52697, rmate_port=args.rmate_port)).returncode
+    print('port', server.server_address[1])
+    r = run(connect_ssh(args.host, local_port=server.server_address[1], remote_port=args.remote_port, rmate_port=args.rmate_port, cwd=args.directory)).returncode
     server.shutdown()
     return r
 
@@ -182,8 +196,8 @@ def ssh(_args):
 def mosh(_args):
     args = parse_connect_args(_args)
     server = start_server(args.host)
-    etp = run_async(connect_et(args.host, no_terminal=True, local_port=server.server_address[1], rmate_port=args.rmate_port))
-    mosh_cmd = connect_mosh(args.host, rmate_port=args.rmate_port)
+    etp = run_async(connect_et(args.host, no_terminal=True, local_port=server.server_address[1], remote_port=args.remote_port, rmate_port=args.rmate_port))
+    mosh_cmd = connect_mosh(args.host, rmate_port=args.rmate_port, cwd=args.directory)
     print(' '.join(mosh_cmd))
     cp = run(mosh_cmd)
     server.shutdown()
@@ -222,7 +236,8 @@ def clangd(args):
     host = remote.get_remote_host(os.getcwd())
     if host:
         path_map = remote.get_path_map(host)
-        remote_run = ['ssh', host] + args + ['--path-mappings={}={}'.format(path_map[0], path_map[1])]
+        mappings = ','.join(["{}={}".format(m[0], m[1]) for m in path_map])
+        remote_run = ['ssh', host] + args + ['--path-mappings={}'.format(mappings)]
         return run(remote_run).returncode
     else:
         return run(args).returncode
