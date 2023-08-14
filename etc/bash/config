@@ -2,10 +2,6 @@
 SCRIPT_DIR=$(dirname ${BASH_SOURCE[0]-$0})
 export DOTFILES=$( cd "$SCRIPT_DIR"/../.. && pwd )
 
-if [[ "$ZSH_VERSION" ]]; then
-    source $DOTFILES/etc/bash/zsh
-fi
-
 export PATH="$HOME/usr/bin:$HOME/.local/bin:$HOME/bin:$HOME/.cargo/bin:$DOTFILES/bin:/usr/local/bin:$PATH"
 
 export CMAKE_PREFIX_PATH="$HOME/usr/"
@@ -38,6 +34,10 @@ then
   export CPUCOUNT=$(nproc)
 else
   export CPUCOUNT="1"
+fi
+
+if [[ "$ZSH_VERSION" ]]; then
+    source $DOTFILES/etc/bash/zsh
 fi
 
 # colored GCC warnings and errors

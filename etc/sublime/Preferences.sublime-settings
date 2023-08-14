@@ -51,6 +51,7 @@
 	"ignored_packages":
 	[
 		"ClangComplete",
+		"LSP-yaml",
 		"Vintage",
 	],
 	"match_brackets_angle": true,
