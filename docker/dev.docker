@@ -9,8 +9,6 @@ RUN apt-get install -y \
     build-essential \
     bc \
     ccache \
-    clang-format-10 \
-    clang-tidy-10 \
     cmake \
     cmake-curses-gui \
     curl \
