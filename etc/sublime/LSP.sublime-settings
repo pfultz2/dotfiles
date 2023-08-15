@@ -8,7 +8,7 @@
       {
         "command": 
         [
-          "remote",
+          "~/dotfiles/bin/remote",
           "clangd",
           "/opt/rocm/llvm/bin/clangd",
           "--log=verbose",
@@ -34,11 +34,10 @@
             "languageId": "objective-cpp",
           },
       ],
-        "env": {
-          // Hardcode the path for dotfiles since sublime's python environment is broken
-          "PATH": "${home}/dotfiles/bin/",
-        },
-      "enabled": true,
+        // "env": {
+        //   // Hardcode the path for dotfiles since sublime's python environment is broken
+        //   "PATH": "${home}/dotfiles/bin/",
+        // },
     },
       "paul-radeon4-clangd":
       {
@@ -140,7 +139,10 @@
       "clangd":
       {
         "command": [
-          "/usr/local/opt/llvm/bin/clangd",
+          "/usr/bin/clangd",
+          "--log=verbose",
+          "--compile-commands-dir=build/",
+          "--recovery-ast",
           "--clang-tidy",
           "--clang-tidy-checks='boost-*,bugprone-*,cert-*,clang-analyzer-*,clang-diagnostic-*,performance-*,readability-*'",
           "--header-insertion=never"
