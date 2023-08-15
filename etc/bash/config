@@ -197,11 +197,12 @@ fi
 # [[ $- == *i* ]] && precmd_functions=(refresh_tmux_env)
 
 if [[ "$BASH_VERSION" ]]; then
-  export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=yes
-  source $DOTFILES/etc/bash/iterm2.bash
+    unset ITERM_ORIG_PS1
+    export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=yes
+    source $DOTFILES/etc/bash/iterm2.bash
 fi
 
 if [[ "$ZSH_VERSION" ]]; then
-  export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=yes
-  source $DOTFILES/etc/bash/iterm2.zsh
+    export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=yes
+    source $DOTFILES/etc/bash/iterm2.zsh
 fi

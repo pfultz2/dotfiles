@@ -52,10 +52,10 @@ function parse_git_branch() {
 
 PROMPT_BRANCH='$(parse_git_branch)'
 
-function parse_elapse_time() {
+function parse_elapsed_time() {
     echo "${LAST_COMMAND_ELAPSED_SECONDS}s"
 }
-PROMPT_ELAPSED='$(parse_elapse_time)'
+PROMPT_ELAPSED='$(parse_elapsed_time)'
 
 # host:user
 PS1="$PROMPT_BEGIN$BIGreen$PROMPT_END$PROMPT_HOST:$PROMPT_USER"
