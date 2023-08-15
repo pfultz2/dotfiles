@@ -151,7 +151,7 @@ def connect_ssh(host, local_port=None, remote_port=None, rmate_port=DEFAULT_RMAT
 
 
 def show_command(cmd):
-    print(shlex.join(cmd))
+    print(shlex.join(cmd), file=sys.stderr)
 
 def run(cmd, *args, **kwargs):
     show_command(cmd)
@@ -234,10 +234,16 @@ def mount(args):
 @command
 def clangd(args):
     host = remote.get_remote_host(os.getcwd())
+    rpath = remote.get_remote_path(host, os.getcwd())
     if host:
+        ssh_cmd = shutil.which('ssh')
+        # Check for ssh to improve logging when using sublime
+        if not ssh_cmd:
+            print("ssh command missing", file=sys.stderr)
         path_map = remote.get_path_map(host)
         mappings = ','.join(["{}={}".format(m[0], m[1]) for m in path_map])
-        remote_run = ['ssh', host] + args + ['--path-mappings={}'.format(mappings)]
+        remote_command = ['cd',  rpath, ';'] + args + ['--path-mappings={}'.format(mappings)]
+        remote_run = [ssh_cmd, host] + shell_wrap(remote_command)
         return run(remote_run).returncode
     else:
         return run(args).returncode
