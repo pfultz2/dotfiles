@@ -51,3 +51,22 @@ function parse_git_branch() {
 }
 
 PROMPT_BRANCH='$(parse_git_branch)'
+
+function parse_elapse_time() {
+    echo "${LAST_COMMAND_ELAPSED_SECONDS}s"
+}
+PROMPT_ELAPSED='$(parse_elapse_time)'
+
+# host:user
+PS1="$PROMPT_BEGIN$BIGreen$PROMPT_END$PROMPT_HOST:$PROMPT_USER"
+# clock time
+PS1="$PS1$PROMPT_BEGIN$Green${PROMPT_END}[$PROMPT_TIME]"
+# elapsed time
+PS1="$PS1$PROMPT_BEGIN$Green${PROMPT_END}[$PROMPT_ELAPSED]"
+PS1="$PS1$PROMPT_NEW_LINE$PROMPT_BEGIN$Color_Off$PROMPT_END"
+# cwd
+PS1="$PS1$PROMPT_BEGIN$Blue$PROMPT_END$PROMPT_CURRENT_WORKING_DIR "
+# git branch
+PS1="$PS1$PROMPT_BEGIN$Yellow$PROMPT_END$PROMPT_BRANCH"
+PS1="$PS1$PROMPT_BEGIN$Color_Off$PROMPT_END$ "
+PS2='$PROMPT_BEGIN\033[01;36m$PROMPT_END>'
