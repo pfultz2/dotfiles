@@ -16,7 +16,7 @@ def netcat(hostname, port, content):
 
 def transform_arg(arg):
     if os.path.exists(arg):
-        return os.path.abspath(arg)
+        return os.path.abspath(os.path.realpath(arg))
     return arg
 
 if __name__ == "__main__":
