@@ -6,10 +6,19 @@ remote_match = [
     '~/*'
 ]
 
+def get_docker_mount():
+    m = os.environ.get('REMOTE_DOCKER_MOUNT', None)
+    if m:
+        return m.split(':')
+    return None
+
 def remote_matches(f):
     if f == '-':
         return False
     fullpath = os.path.abspath(f)
+    docker_mount = get_docker_mount()
+    if docker_mount:
+        return fullpath.startswith(docker_mount[0])
     for pattern in remote_match:
         p = os.path.expanduser(pattern)
         if fnmatch.fnmatchcase(fullpath, p):
@@ -51,6 +60,11 @@ def parse_file(f):
     return (f, 0)
 
 
+def get_docker_mount():
+    m = os.environ.get('REMOTE_DOCKER_MOUNT', None)
+    if m:
+        return m.split(':')
+    return None
 
 def tmcommand(name, args, f, line=None):
     filename = f

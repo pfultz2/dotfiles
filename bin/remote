@@ -58,13 +58,13 @@ def create_connection_handler(hostname):
             # If it doesnt exists then sync it first
             if not os.path.exists(f):
                 synced = True
-                remote.pull([f, '-a'], pipe=self.wfile)
+                remote.pull([f, '-q'], pipe=self.wfile)
             # Create new window if its a directory
             if os.path.isdir(f):
                 cmd.append('-n')
             elif not synced:
                 # If its a file then sync it before opening
-                remote.pull([f, '-a'], pipe=self.wfile)
+                remote.pull([f, '-q'], pipe=self.wfile)
             cmd.append(f + ':' + args.line)
             self.writeline(' '.join(cmd))
             return subprocess.Popen(cmd, stdout=self.wfile, stderr=self.wfile)

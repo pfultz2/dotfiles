@@ -45,13 +45,15 @@ class DockerRunCommandBuilder:
 
 def build_docker_command():
     docker_home = '/home/' + os.getlogin()
+    cwd = os.getcwd()
     current_histfile = os.environ['CURRENT_HISTFILE']
     command = DockerRunCommandBuilder()
     command.add_mount('/etc/localtime')
     command.add_mount(os.getcwd(), '/data')
     command.add_arg('-w', '/data')
+    command.add_env_var('REMOTE_DOCKER_MOUNT', f'/data:{cwd}')
     
-    command.propagate_env_vars(['RMATE_PORT'])
+    command.propagate_env_vars(['RMATE_PORT', 'SUBLIME_REMOTE_PORT'])
     command.add_mount('~/.ssh', f'{docker_home}/.ssh')
     command.add_mount('~/.ccache', '/ccache')
     command.add_mount('~/onnx', '/onnx')

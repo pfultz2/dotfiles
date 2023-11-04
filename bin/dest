@@ -14,6 +14,19 @@ def netcat(hostname, port, content):
             else:
                 break
 
+def get_docker_mount():
+    m = os.environ.get('REMOTE_DOCKER_MOUNT', None)
+    if m:
+        return m.split(':')
+    return None
+
+def get_docker_host_path(p):
+    m = get_docker_mount()
+    if m:
+        return p.replace(m[0], m[1])
+    return p
+
+
 def transform_arg(arg):
     if os.path.exists(arg):
         return os.path.abspath(os.path.realpath(arg))

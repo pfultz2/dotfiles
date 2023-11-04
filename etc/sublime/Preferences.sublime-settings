@@ -63,5 +63,6 @@
 	"translate_tabs_to_spaces": true,
 	"auto_complete": true,
 	"auto_complete_use_history": true,
+	"auto_complete_use_index": true,
 	"show_git_status": false,
 }

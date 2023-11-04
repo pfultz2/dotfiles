@@ -104,8 +104,13 @@ def pipe_writeline(pipe, s):
     if pipe:
         pipe.write((s + "\n").encode('utf-8'))
 
-def rsync(src, dst, exclude=None, delete=False, shallow=False, **kwargs):
-    cmd = [shutil.which('rsync'), '--verbose', '--times', '--compress', '--progress']
+def rsync(src, dst, exclude=None, delete=False, shallow=False, quiet=False, **kwargs):
+    cmd = [shutil.which('rsync'), '--times', '--compress']
+    if quiet:
+        cmd.append('--quiet')
+    else:
+        cmd.append('--verbose')
+        cmd.append('--progress')
     if DRY_RUN:
         cmd.append('--dry-run')
     if delete:
@@ -133,6 +138,7 @@ def remote_sync(args, f, pipe=None):
     parser.add_argument('file', help='file to sync with remote')
     parser.add_argument('--delete', '-d', action='store_true', help='delete files missing')
     parser.add_argument('--all', '-a', action='store_true', help='dont exclude any files')
+    parser.add_argument('--quiet', '-q', action='store_true', help='Less output')
     parser.add_argument('--shallow', '-s', action='store_true', help='only sync current directory')
     pargs = parser.parse_args(args)
     local = pargs.file or os.getcwd()
@@ -149,7 +155,7 @@ def remote_sync(args, f, pipe=None):
             os.makedirs(os.path.dirname(local))
     src, dst = f(local, remote)
     exclude = not pargs.all if os.path.isdir(local) else False
-    return rsync(src, dst, exclude=exclude_sync if exclude else [], delete=pargs.delete, shallow=pargs.shallow, stdout=pipe, stderr=subprocess.STDOUT)
+    return rsync(src, dst, exclude=exclude_sync if exclude else [], delete=pargs.delete, shallow=pargs.shallow, quiet=pargs.quiet, stdout=pipe, stderr=subprocess.STDOUT)
 
 def pull(args, pipe=None):
     return remote_sync(args, lambda local, remote: (remote, local), pipe=pipe)
