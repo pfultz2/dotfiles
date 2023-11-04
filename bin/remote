@@ -6,6 +6,7 @@ sys.path.append(__py_dir__)
 import remote
 
 DEFAULT_RMATE_PORT=52699
+DEFAULT_REMOTE_PORT=52697
 SUBLIME_LOCAL_RMATE_PORT=52698
 
 __commands__ = {}
@@ -57,13 +58,13 @@ def create_connection_handler(hostname):
             # If it doesnt exists then sync it first
             if not os.path.exists(f):
                 synced = True
-                remote.pull([f], pipe=self.wfile)
+                remote.pull([f, '-q'], pipe=self.wfile)
             # Create new window if its a directory
             if os.path.isdir(f):
                 cmd.append('-n')
             elif not synced:
                 # If its a file then sync it before opening
-                remote.pull([f], pipe=self.wfile)
+                remote.pull([f, '-q'], pipe=self.wfile)
             cmd.append(f + ':' + args.line)
             self.writeline(' '.join(cmd))
             return subprocess.Popen(cmd, stdout=self.wfile, stderr=self.wfile)
@@ -78,6 +79,13 @@ def create_connection_handler(hostname):
         def command_push(self, args):
             largs = self.get_local_args(args)
             remote.pull(largs, pipe=self.wfile)
+
+        def command_firefox(self, args):
+            largs = self.get_local_args(args)
+            cmd = ['open', '-a', 'firefox'] if sys.platform == "darwin" else [shutil.which('firefox')]
+            cmd += largs
+            self.writeline(shlex.join(cmd))
+            return subprocess.Popen(cmd, stdout=self.wfile, stderr=self.wfile)
 
     return ConnectionHandler
 
@@ -101,9 +109,11 @@ def rformat(s, *args, **kwargs):
             return None
     return s.format(*args, **kwargs)
 
-
-def bash_command(remote_port=None, rmate_port=None):
-    return rempty([
+def bash_command(remote_port=None, rmate_port=None, cwd=None):
+    cd = []
+    if cwd:
+        cd = ['cd', cwd, ';']
+    return cd + rempty([
         'env',
         rformat('RMATE_PORT={}', rmate_port or DEFAULT_RMATE_PORT),
         rformat('SUBLIME_REMOTE_PORT={}', remote_port), '$SHELL', '-il'
@@ -112,10 +122,16 @@ def bash_command(remote_port=None, rmate_port=None):
 def shell_wrap(commands):
     return ['sh', '-c', ' '.join(commands)]
 
-def connect_et(host, no_terminal=False, local_port=None, remote_port=None, rmate_port=DEFAULT_RMATE_PORT, **kwargs):
+def make_command(cmd):
+    args = shlex.split(cmd)
+    if(not os.path.exists(args[0])):
+        args[0] = shutil.which(args[0])
+    return args
+
+def connect_et(et, host, no_terminal=False, local_port=None, remote_port=None, rmate_port=DEFAULT_RMATE_PORT, **kwargs):
     ports = rempty([rformat('{}:{}', remote_port, local_port), f'{rmate_port}:{SUBLIME_LOCAL_RMATE_PORT}'])
     print(ports)
-    result = [shutil.which('et'), '-r', ','.join(ports)]
+    result = make_command(et) + ['-r', ','.join(ports)]
     if no_terminal:
         result.append('--no-terminal')
         result.append('-x')
@@ -126,18 +142,22 @@ def connect_et(host, no_terminal=False, local_port=None, remote_port=None, rmate
     result.append(host)
     return result
 
-def connect_mosh(host, **kwargs):
-    return [shutil.which('mosh'), '--', host] + shell_wrap(bash_command(**kwargs))
+def connect_mosh(mosh, host, **kwargs):
+    return make_command(mosh) + ['--', host] + shell_wrap(bash_command(**kwargs))
 
 def connect_ssh(host, local_port=None, remote_port=None, rmate_port=DEFAULT_RMATE_PORT, **kwargs):
+    sublime_port_forward = []
+    if local_port and remote_port:
+        sublime_port_forward = ['-R', f'{remote_port}:localhost:{local_port}']
     return rempty([
-        shutil.which('ssh'), '-t', rformat('-R', local_port, remote_port),
-        rformat('{}:localhost:{}', '52697', remote_port, local_port), '-R', f'{rmate_port}:localhost:{SUBLIME_LOCAL_RMATE_PORT}', host
+        shutil.which('ssh'), '-t',
+        *sublime_port_forward,
+        '-R', f'{rmate_port}:localhost:{SUBLIME_LOCAL_RMATE_PORT}', host
     ] + bash_command(remote_port=remote_port, rmate_port=rmate_port, **kwargs))
 
 
 def show_command(cmd):
-    print(shlex.join(cmd))
+    print(shlex.join(cmd), file=sys.stderr)
 
 def run(cmd, *args, **kwargs):
     show_command(cmd)
@@ -149,8 +169,16 @@ def run_async(cmd, *args, **kwargs):
 
 def parse_connect_args(args):   
     ap = argparse.ArgumentParser(args)
-    ap.add_argument('host')
+    path = None
+    host = remote.get_remote_host(os.getcwd())
+    if host:
+        path = remote.get_remote_path(host, os.getcwd())
+    ap.add_argument('host', nargs='?', default=host)
     ap.add_argument('--rmate-port', '-m', default=DEFAULT_RMATE_PORT)
+    ap.add_argument('--remote-port', '-p', default=DEFAULT_REMOTE_PORT)
+    ap.add_argument('--directory', '-d', default=path)
+    ap.add_argument('--et', default='et')
+    ap.add_argument('--mosh', default='mosh')
     return ap.parse_args(args)
 
 @command
@@ -158,7 +186,7 @@ def et(_args):
     args = parse_connect_args(_args)
     server = start_server(args.host)
     print('port', server.server_address[1])
-    r = run(connect_et(args.host, local_port=server.server_address[1], remote_port=52697, rmate_port=args.rmate_port)).returncode
+    r = run(connect_et(args.et, args.host, local_port=server.server_address[1], remote_port=args.remote_port, rmate_port=args.rmate_port, cwd=args.directory)).returncode
     server.shutdown()
     return r
 
@@ -166,7 +194,8 @@ def et(_args):
 def ssh(_args):
     args = parse_connect_args(_args)
     server = start_server(args.host)
-    r = run(connect_ssh(args.host, local_port=server.server_address[1], remote_port=52697, rmate_port=args.rmate_port)).returncode
+    print('port', server.server_address[1])
+    r = run(connect_ssh(args.host, local_port=server.server_address[1], remote_port=args.remote_port, rmate_port=args.rmate_port, cwd=args.directory)).returncode
     server.shutdown()
     return r
 
@@ -175,8 +204,8 @@ def ssh(_args):
 def mosh(_args):
     args = parse_connect_args(_args)
     server = start_server(args.host)
-    etp = run_async(connect_et(args.host, no_terminal=True, local_port=server.server_address[1], rmate_port=args.rmate_port))
-    mosh_cmd = connect_mosh(args.host, rmate_port=args.rmate_port)
+    etp = run_async(connect_et(args.et, args.host, no_terminal=True, local_port=server.server_address[1], remote_port=args.remote_port, rmate_port=args.rmate_port))
+    mosh_cmd = connect_mosh(args.mosh, args.host, rmate_port=args.rmate_port, cwd=args.directory)
     print(' '.join(mosh_cmd))
     cp = run(mosh_cmd)
     server.shutdown()
@@ -192,14 +221,14 @@ def rssh(_args):
 @command
 def ret(_args):
     args = parse_connect_args(_args)
-    r = run(connect_et(args.host, rmate_port=args.rmate_port)).returncode
+    r = run(connect_et(args.et, args.host, rmate_port=args.rmate_port)).returncode
     return r
 
 @command
 def rmosh(_args):
     args = parse_connect_args(_args)
-    etp = run_async(connect_et(args.host, no_terminal=True, rmate_port=args.rmate_port))
-    mosh_cmd = connect_mosh(args.host, rmate_port=args.rmate_port)
+    etp = run_async(connect_et(args.et, args.host, no_terminal=True, rmate_port=args.rmate_port))
+    mosh_cmd = connect_mosh(args.mosh, args.host, rmate_port=args.rmate_port)
     print(' '.join(mosh_cmd))
     cp = run(mosh_cmd)
     etp.kill()
@@ -213,9 +242,16 @@ def mount(args):
 @command
 def clangd(args):
     host = remote.get_remote_host(os.getcwd())
+    rpath = remote.get_remote_path(host, os.getcwd())
     if host:
+        ssh_cmd = shutil.which('ssh')
+        # Check for ssh to improve logging when using sublime
+        if not ssh_cmd:
+            print("ssh command missing", file=sys.stderr)
         path_map = remote.get_path_map(host)
-        remote_run = ['ssh', host] + args + ['--path-mappings={}={}'.format(path_map[0], path_map[1])]
+        mappings = ','.join(["{}={}".format(m[0], m[1]) for m in path_map])
+        remote_command = ['cd',  rpath, ';'] + args + ['--path-mappings={}'.format(mappings)]
+        remote_run = [ssh_cmd, host] + shell_wrap(remote_command)
         return run(remote_run).returncode
     else:
         return run(args).returncode

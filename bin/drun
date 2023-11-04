@@ -1,53 +1,90 @@
-#!/bin/bash
+#!/usr/bin/python3
 
-DOCKER_MINOR_VERSION=$(docker --version | sed "s/.*Docker version \([^ ]*\).*$/\1/" | cut -f 2 -d.)
-CURRENT_DIR=${CURRENT_DIR:-`pwd`}
-DATA_DIR=${DATA_DIR:-/data}
-DOCKER_OPTIONS=(-v="$CURRENT_DIR:$DATA_DIR" -w $DATA_DIR)
-if [ -f /etc/localtime ]; then
-    DOCKER_OPTIONS+=(-v='/etc/localtime:/etc/localtime')
-fi
+import argparse, subprocess, os, shlex, sys, grp
 
-if [ -d /tmp/.X11-unix ]; then
-    for SOCK in $(ls -1 /tmp/.X11-unix/);
-    do
-        DOCKER_OPTIONS+=(-v="/tmp/.X11-unix/$SOCK:/tmp/.X11-unix/$SOCK")
-    done 
-fi
+def show_command(cmd):
+    print(shlex.join(cmd), file=sys.stderr)
 
-ls /dev/kfd && DOCKER_OPTIONS+=(--device='/dev/kfd')
-ls /dev/dri && DOCKER_OPTIONS+=(--device='/dev/dri' --group-add video --group-add $(getent group render | cut -d':' -f 3))
+def run(cmd, *args, **kwargs):
+    show_command(cmd)
+    return subprocess.run(cmd, *args, **kwargs)
 
-# if [ "$DOCKER_MINOR_VERSION" -lt "11" ]; then
-#     DNS_SERVERS=$((nmcli dev list || nmcli dev show) 2> /dev/null | grep DNS | sed 's/\s\s*/\t/g' | cut -f 2)
-#     for SERVER in $DNS_SERVERS; do
-#         DOCKER_OPTIONS+=(--dns $SERVER)
-#     done
-# else
-#     DOCKER_OPTIONS+=(--network 'host' --userns 'host')
-# fi
-DOCKER_OPTIONS+=(--network 'host' --userns 'host')
+class DockerRunCommandBuilder:
+    def __init__(self):
+        self.command = ['docker', 'run', '-it']
 
-# TODO: use --add-host to add hosts from /etc/hosts
+    def add_arg(self, *args):
+        for arg in args:
+            self.command.append(arg)
 
-# DOCKER_OPTIONS+=(-u $(id -u):$(id -g) -v="$HOME/.ssh:$HOME/.ssh:ro")
+    def add_mount(self, host_path, container_path=None):
+        host_path2 = os.path.expanduser(host_path)
+        if os.path.exists(host_path2):
+            container_path2 = container_path or host_path2
+            self.add_arg(f'-v={host_path2}:{container_path2}')
 
-USERNAME=$(id -nu)
-DOCKER_HOME=/home/$USERNAME
-# DOCKER_OPTIONS+=(-p 52698:52698)
-if [[ ! -z "$RMATE_PORT" ]]; then
-    DOCKER_OPTIONS+=(-e "RMATE_PORT=$RMATE_PORT")
-fi
-DOCKER_OPTIONS+=(-v="$HOME/.ssh:$DOCKER_HOME/.ssh")
-mkdir -p $HOME/.ccache
-DOCKER_OPTIONS+=(-v="$HOME/.ccache:/ccache")
-DOCKER_OPTIONS+=(-v="$CURRENT_HISTFILE:/.bash_history" -e HISTFILE=/.bash_history)
-DOCKER_OPTIONS+=(--cap-add SYS_PTRACE)
-# DOCKER_OPTIONS+=(--security-opt seccomp:unconfined --security-opt apparmor:unconfined)
-# DOCKER_OPTIONS+=(--privileged)
-# DOCKER_HOME=$(docker run $1 sh -c 'echo $HOME')
-# DOCKER_USER=$(id -u)
-# -v="$HOME/.ssh:$DOCKER_HOME/.ssh:ro"
-echo "docker run -it ${DOCKER_OPTIONS[@]} $@"
-docker run -it ${DOCKER_OPTIONS[@]} $@
+    def add_env_var(self, var, value):
+        self.add_arg('-e', f'{var}={value}')
 
+    def propagate_env_vars(self, vars):
+        for var in vars:
+            if var in os.environ:
+                self.add_env_var(var, os.environ[var])
+
+    def add_device(self, device):
+        if os.path.exists(device):
+            self.add_arg(f'--device={device}')
+
+    def add_group(self, group):
+        self.add_arg('--group-add', group)
+
+    def add_cap(self, cap):
+        self.add_arg('--cap-add', cap)
+
+
+
+def build_docker_command():
+    docker_home = '/home/' + os.getlogin()
+    cwd = os.getcwd()
+    current_histfile = os.environ['CURRENT_HISTFILE']
+    command = DockerRunCommandBuilder()
+    command.add_mount('/etc/localtime')
+    command.add_mount(os.getcwd(), '/data')
+    command.add_arg('-w', '/data')
+    command.add_env_var('REMOTE_DOCKER_MOUNT', f'/data:{cwd}')
+    
+    command.propagate_env_vars(['RMATE_PORT', 'SUBLIME_REMOTE_PORT'])
+    command.add_mount('~/.ssh', f'{docker_home}/.ssh')
+    command.add_mount('~/.ccache', '/ccache')
+    command.add_mount('~/onnx', '/onnx')
+    command.add_mount(f'{current_histfile}', '/.bash_history')
+    command.add_mount(f'{current_histfile}.d', '/.bash_history.d')
+    command.add_env_var('HISTFILE', '/.bash_history')
+
+
+    if os.path.exists('/tmp/.X11-unix/'):
+        for d in os.listdir('/tmp/.X11-unix/'):
+            command.add_mount(os.path.join('/tmp/.X11-unix/', d))
+    command.add_device('/dev/kfd')
+    if os.path.exists('/dev/dri'):
+        command.add_device('/dev/dri')
+        command.add_group('video')
+        command.add_group(str(grp.getgrnam('render').gr_gid))
+    command.add_arg('--network', 'host')
+    command.add_arg('--userns', 'host')
+
+    command.add_cap('SYS_PTRACE')
+
+    return command.command
+
+def parse_args(args):
+    parser = argparse.ArgumentParser("drun")
+    parser.add_argument('image')
+    parser.add_argument('command', nargs=argparse.REMAINDER)
+    return parser.parse_args(args)
+
+if __name__ == "__main__":
+    args = parse_args(sys.argv[1:])
+    command = build_docker_command()
+    r = run(command + [args.image] + args.command).returncode
+    exit(r)

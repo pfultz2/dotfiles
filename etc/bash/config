@@ -36,6 +36,10 @@ else
   export CPUCOUNT="1"
 fi
 
+if [[ "$ZSH_VERSION" ]]; then
+    source $DOTFILES/etc/bash/zsh
+fi
+
 # colored GCC warnings and errors
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
@@ -69,6 +73,9 @@ alias path='echo $PATH | tr -s ":" "\n"'
 # URL-encode strings
 alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.argv[1]);"'
 
+# Reload the shell (i.e. invoke as a login shell)
+alias reload="exec ${SHELL} -l"
+
 alias a='cppcheck-all'
 
 alias tm='tmux att || tmux'
@@ -77,6 +84,7 @@ alias cmake-ccache='cmake -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILE
 alias ssh-subl='ssh -R 52698:localhost:52698'
 alias et-subl='et -r 52698:52698'
 alias restart-pane='tmux respawn-pane -k'
+alias update-env='eval $(tmux showenv -s)'
 
 function mosh-subl {
     # stty -tostop
@@ -139,11 +147,11 @@ fi
 export CURRENT_HISTFILE=$HISTFILE
 
 if [ -n "$TMUX" ]; then
-    function refresh_env {
+    function refresh_tmux_env {
         eval "$(tmux showenv -s)"
     }
 else
-    function refresh_env {
+    function refresh_tmux_env {
         echo > /dev/null
     }
 fi
@@ -166,18 +174,35 @@ fi
 source $DOTFILES/etc/bash/colors
 source $DOTFILES/etc/bash/functions
 
-[[ $- == *i* ]] && source $DOTFILES/etc/bash/prompt
-[[ $- == *i* ]] && PS1="$PROMPT_BEGIN$BIGreen$PROMPT_END$PROMPT_HOST:$PROMPT_USER$PROMPT_BEGIN$Green${PROMPT_END}[$PROMPT_TIME]$PROMPT_NEW_LINE$PROMPT_BEGIN$Blue$PROMPT_END$PROMPT_CURRENT_WORKING_DIR $PROMPT_BEGIN$Yellow$PROMPT_END$PROMPT_BRANCH$PROMPT_BEGIN$Color_Off$PROMPT_END$ "
-[[ $- == *i* ]] && PS2='$PROMPT_BEGIN\033[01;36m$PROMPT_END>'
-[[ $- == *i* ]] && PROMPT_COMMAND="refresh_env;$PROMPT_COMMAND"
-[[ $- == *i* ]] && precmd_functions=(refresh_env)
+function preexec {                                                                                    
+    refresh_tmux_env
+    cmd_start="$SECONDS"
+}
+function precmd {
+    local cmd_end="$SECONDS"
+    export LAST_COMMAND_ELAPSED_SECONDS=$((cmd_end-cmd_start))
+}
 
 if [[ "$BASH_VERSION" ]]; then
-  export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=yes
-  source $DOTFILES/etc/bash/iterm2.bash
+    preexec_invoke_exec () {
+        [ -n "$COMP_LINE" ] && return  # do nothing if completing
+        [ "$BASH_COMMAND" = "$PROMPT_COMMAND" ] && return # don't cause a preexec for $PROMPT_COMMAND
+        preexec
+    }
+    trap 'preexec_invoke_exec' DEBUG
+fi
+
+[[ $- == *i* ]] && source $DOTFILES/etc/bash/prompt
+[[ $- == *i* ]] && PROMPT_COMMAND="precmd;$PROMPT_COMMAND"
+# [[ $- == *i* ]] && precmd_functions=(refresh_tmux_env)
+
+if [[ "$BASH_VERSION" ]]; then
+    unset ITERM_ORIG_PS1
+    export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=yes
+    source $DOTFILES/etc/bash/iterm2.bash
 fi
 
 if [[ "$ZSH_VERSION" ]]; then
-  export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=yes
-  source $DOTFILES/etc/bash/iterm2.zsh
+    export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=yes
+    source $DOTFILES/etc/bash/iterm2.zsh
 fi
