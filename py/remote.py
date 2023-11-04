@@ -47,13 +47,18 @@ def get_mounts():
             return json.load(f)
     return {}
 
+def map_path(p, src, dest):
+    if p.startswith(src):
+        return os.path.join(dest, os.path.relpath(p, src))
+    return p
+
 mounts = get_mounts()
 def get_local_path(host, path):
     if host in mounts:
         m = mounts[host]
         local = m[0]
         remote = m[1]
-        return path.replace(remote, local)
+        return map_path(path, remote, local)
     return os.path.join(remote_dir, host, path[1:])
 
 def get_remote_path(host, path):
@@ -62,8 +67,8 @@ def get_remote_path(host, path):
         m = mounts[host]
         local = m[0]
         remote = m[1]
-        return p.replace(local, remote)
-    return p.replace(os.path.join(remote_dir, host), '')
+        return map_path(path, local, remote)
+    return map_path(p, os.path.join(remote_dir, host), '/')
 
 def get_remote_host(path):
     p = os.path.abspath(path)
