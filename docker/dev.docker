@@ -63,6 +63,7 @@ RUN groupadd --force --gid ${group_id} ${username}
 RUN useradd --non-unique --create-home --shell /bin/bash -u ${user_id} --gid ${group_id} ${username}
 RUN usermod -aG sudo ${username}
 RUN echo "ALL            ALL = (ALL) NOPASSWD: ALL" >> /etc/sudoers
+RUN chown ${user_id}:${group_id} /.bash_history.d
 USER ${username}
 
 ENV HOME=/home/${username}
