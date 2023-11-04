@@ -22,14 +22,14 @@ def get_docker_mount():
 
 def get_docker_host_path(p):
     m = get_docker_mount()
-    if m:
-        return p.replace(m[0], m[1])
+    if m and p.startswith(m[0]):
+        return os.path.join(m[1], os.path.relpath(p, m[0]))
     return p
 
 
 def transform_arg(arg):
     if os.path.exists(arg):
-        return os.path.abspath(os.path.realpath(arg))
+        return get_docker_host_path(os.path.abspath(os.path.realpath(arg)))
     return arg
 
 if __name__ == "__main__":
