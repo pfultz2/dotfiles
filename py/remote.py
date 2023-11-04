@@ -7,6 +7,7 @@ exclude_sync = [
     '*build/',
     'build*/',
     '.tox',
+    '*.co',
     '*.deb',
     '*.rpm',
     "*.a1",
