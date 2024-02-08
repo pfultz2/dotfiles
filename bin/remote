@@ -119,18 +119,27 @@ def bash_command(remote_port=None, rmate_port=None, cwd=None):
         rformat('SUBLIME_REMOTE_PORT={}', remote_port), '$SHELL', '-il'
     ])
 
-def shell_wrap(commands):
-    return ['sh', '-c', ' '.join(commands)]
+def shell_quote(s):
+    if ['$SHELL', ';']:
+        return s
+    return shlex.quote(s)
 
-def make_command(cmd):
+def shell_join(commands):
+    return ' '.join([shell_quote(s) for s in commands])
+
+def shell_wrap(commands):
+    return ['sh', '-c', shell_join(commands)]
+
+def make_command(cmd, remote=False):
     args = shlex.split(cmd)
-    if(not os.path.exists(args[0])):
-        args[0] = shutil.which(args[0])
+    if not remote:
+        if(not os.path.exists(args[0])):
+            args[0] = shutil.which(args[0])
     return args
 
 def connect_et(et, host, no_terminal=False, local_port=None, remote_port=None, rmate_port=DEFAULT_RMATE_PORT, **kwargs):
     ports = rempty([rformat('{}:{}', remote_port, local_port), f'{rmate_port}:{SUBLIME_LOCAL_RMATE_PORT}'])
-    print(ports)
+    # print(ports)
     result = make_command(et) + ['-r', ','.join(ports)]
     if no_terminal:
         result.append('--no-terminal')
@@ -138,12 +147,12 @@ def connect_et(et, host, no_terminal=False, local_port=None, remote_port=None, r
     else:
         result.append('-c')
         # Add a space so the command is not added to bash history
-        result.append(' ' + ' '.join(bash_command(remote_port=remote_port, rmate_port=rmate_port, **kwargs)))
+        result.append(' ' + shell_join(bash_command(remote_port=remote_port, rmate_port=rmate_port, **kwargs)))
     result.append(host)
     return result
 
-def connect_mosh(mosh, host, **kwargs):
-    return make_command(mosh) + ['--', host] + shell_wrap(bash_command(**kwargs))
+def connect_mosh(mosh, host, remote=False, **kwargs):
+    return make_command(mosh, remote=remote) + ['--', host] + shell_wrap(bash_command(**kwargs))
 
 def connect_ssh(host, local_port=None, remote_port=None, rmate_port=DEFAULT_RMATE_PORT, **kwargs):
     sublime_port_forward = []
@@ -155,6 +164,9 @@ def connect_ssh(host, local_port=None, remote_port=None, rmate_port=DEFAULT_RMAT
         '-R', f'{rmate_port}:localhost:{SUBLIME_LOCAL_RMATE_PORT}', host
     ] + bash_command(remote_port=remote_port, rmate_port=rmate_port, **kwargs))
 
+def connect_jump_mosh(et, jhost, mosh, host, **kwargs):
+    mosh_cmd = connect_mosh(mosh, host, remote=True, **kwargs)
+    return make_command(et) + ['-c'] + [' ' + shlex.join(mosh_cmd)] + [jhost]
 
 def show_command(cmd):
     print(shlex.join(cmd), file=sys.stderr)
@@ -177,6 +189,7 @@ def parse_connect_args(args):
     ap.add_argument('--rmate-port', '-m', default=DEFAULT_RMATE_PORT)
     ap.add_argument('--remote-port', '-p', default=DEFAULT_REMOTE_PORT)
     ap.add_argument('--directory', '-d', default=path)
+    ap.add_argument('--jump-host', '-J')
     ap.add_argument('--et', default='et')
     ap.add_argument('--mosh', default='mosh')
     return ap.parse_args(args)
@@ -205,8 +218,11 @@ def mosh(_args):
     args = parse_connect_args(_args)
     server = start_server(args.host)
     etp = run_async(connect_et(args.et, args.host, no_terminal=True, local_port=server.server_address[1], remote_port=args.remote_port, rmate_port=args.rmate_port))
-    mosh_cmd = connect_mosh(args.mosh, args.host, rmate_port=args.rmate_port, cwd=args.directory)
-    print(' '.join(mosh_cmd))
+    mosh_cmd = None
+    if args.jump_host:
+        mosh_cmd = connect_jump_mosh(args.et, args.jump_host, args.mosh, args.host, remote_port=args.remote_port, rmate_port=args.rmate_port, cwd=args.directory)
+    else:
+        mosh_cmd = connect_mosh(args.mosh, args.host, remote_port=args.remote_port, rmate_port=args.rmate_port, cwd=args.directory)
     cp = run(mosh_cmd)
     server.shutdown()
     etp.kill()
@@ -228,8 +244,10 @@ def ret(_args):
 def rmosh(_args):
     args = parse_connect_args(_args)
     etp = run_async(connect_et(args.et, args.host, no_terminal=True, rmate_port=args.rmate_port))
-    mosh_cmd = connect_mosh(args.mosh, args.host, rmate_port=args.rmate_port)
-    print(' '.join(mosh_cmd))
+    if args.jump_host:
+        mosh_cmd = connect_jump_mosh(args.et, args.jump_host, args.mosh, args.host, rmate_port=args.rmate_port, cwd=args.directory)
+    else:
+        mosh_cmd = connect_mosh(args.mosh, args.host, rmate_port=args.rmate_port, cwd=args.directory)
     cp = run(mosh_cmd)
     etp.kill()
     return cp.returncode
@@ -239,22 +257,42 @@ def mount(args):
     print(json.dumps(remote.get_mounts()))
     return 0
 
+def create_docker_command(image, d, working_directory='/data'):
+    return ['docker', 'run', '-i', '-u', str(os.getuid()), f'-v={d}:{working_directory}', '-w', working_directory, image]
+
 @command
 def clangd(args):
-    host = remote.get_remote_host(os.getcwd())
-    rpath = remote.get_remote_path(host, os.getcwd())
+    root = os.getcwd()
+    host = remote.get_remote_host(root)
+    rpath = remote.get_remote_path(host, root)
+    config_path = os.path.join(root, 'clangd.json')
+    config = {}
+    if os.path.exists(config_path):
+        with open(config_path) as f:
+            config = json.load(f)
+    clangd_command = ['clangd']
+    if args:
+        clangd_command = args
+    elif 'command' in config:
+        clangd_command = config['command']
+    docker_command = []
+    if 'image' in config:
+        docker_command = create_docker_command(config['image'], rpath)
     if host:
         ssh_cmd = shutil.which('ssh')
         # Check for ssh to improve logging when using sublime
         if not ssh_cmd:
             print("ssh command missing", file=sys.stderr)
-        path_map = remote.get_path_map(host)
+        path_map = [[root, '/data']] if docker_command else remote.get_path_map(host)
         mappings = ','.join(["{}={}".format(m[0], m[1]) for m in path_map])
-        remote_command = ['cd',  rpath, ';'] + args + ['--path-mappings={}'.format(mappings)]
+        remote_command = ['cd',  rpath, ';'] + docker_command + clangd_command + ['--path-mappings={}'.format(mappings)]
         remote_run = [ssh_cmd, host] + shell_wrap(remote_command)
         return run(remote_run).returncode
     else:
-        return run(args).returncode
+        cmd = docker_command + clangd_command
+        if docker_command:
+            cmd = cmd + [f'--path-mappings={root}=/data']
+        return run(cmd).returncode
 
 
 if __name__ == "__main__":
