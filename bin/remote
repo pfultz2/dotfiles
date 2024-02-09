@@ -120,7 +120,9 @@ def bash_command(remote_port=None, rmate_port=None, cwd=None):
     ])
 
 def shell_quote(s):
-    if ['$SHELL', ';']:
+    if s in ['$SHELL', ';']:
+        return s
+    if s.startswith('$(') and s.endswith(')'):
         return s
     return shlex.quote(s)
 
@@ -258,7 +260,7 @@ def mount(args):
     return 0
 
 def create_docker_command(image, d, working_directory='/data'):
-    return ['docker', 'run', '-i', '-u', str(os.getuid()), f'-v={d}:{working_directory}', '-w', working_directory, image]
+    return ['docker', 'run', '-i', '-u', '$(id -u)', f'-v={d}:{working_directory}', '-w', working_directory, image]
 
 @command
 def clangd(args):
