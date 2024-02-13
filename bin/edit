@@ -79,15 +79,13 @@ if __name__ == "__main__":
     if args.tmux and (f.startswith('-') or not os.path.isfile(f)):
         exit(0)
 
+    if not os.path.exists(f):
+        open(f, 'a').close()
     if shutil.which('lapce'):
         subprocess.run([shutil.which('lapce'), f])
     elif os.environ.get('TERM_PROGRAM', '') == 'vscode':
-        if not os.path.exists(f):
-            open(f, 'a').close()
         subprocess.run(tmcommand('code', args, f))
     elif 'SUBLIME_REMOTE_PORT' in os.environ and remote_matches(f) and not args.wait:
-        if not os.path.exists(f):
-            open(f, 'a').close()
         subprocess.run([shutil.which('dest'), 'open', f, '--line', str(line)])
     elif 'RMATE_PORT' in os.environ and (os.path.isfile(f) or f == '-'):
         subprocess.run(tmcommand('rsubl', args, f))
