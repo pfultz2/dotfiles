@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
-import argparse, subprocess, os, shlex, sys, grp, uuid
-import shutil
+import argparse, json, subprocess, os, shlex, shutil, sys, grp, uuid
 
 def show_command(cmd):
     print(shlex.join(cmd), file=sys.stderr)
@@ -100,12 +99,18 @@ def parse_args(args):
 if __name__ == "__main__":
     args = parse_args(sys.argv[1:])
     command = build_docker_command()
+    config_path = os.path.expanduser('~/drun.json')
+    config = {}
+    if os.path.exists(config_path):
+        with open(config_path) as f:
+            config = json.load(f)
+    user_args = config.get('args', [])
     for e in args.env or []:
         x = e.split('=')
         command.add_env_var(x[0], x[1])
     username = os.getlogin()
     container_name = '-'.join([username, args.image, str(uuid.uuid1())])
     set_tmux_option('tmux_docker_container', container_name)
-    r = run(command.command + ['--name', container_name, args.image] + args.command).returncode
+    r = run(command.command + user_args + ['--name', container_name, args.image] + args.command).returncode
     set_tmux_option('tmux_docker_container')
     exit(r)
