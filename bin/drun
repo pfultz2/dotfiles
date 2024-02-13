@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
-import argparse, subprocess, os, shlex, sys, grp
+import argparse, subprocess, os, shlex, sys, grp, uuid
+import shutil
 
 def show_command(cmd):
     print(shlex.join(cmd), file=sys.stderr)
@@ -77,6 +78,17 @@ def build_docker_command():
 
     return command
 
+def set_tmux_option(var, value=None):
+    tmux = shutil.which('tmux')
+    if not tmux:
+        return
+    pane_id = os.environ.get('TMUX_PANE', "")
+    tmux_var = '@'+var+'_'+pane_id
+    if value:
+        subprocess.run([tmux, 'set', '-q', tmux_var, value])
+    else:
+        subprocess.run([tmux, 'set', '-u', tmux_var])
+
 def parse_args(args):
     parser = argparse.ArgumentParser("drun")
     parser.add_argument('-e', '--env', action='append')
@@ -87,8 +99,12 @@ def parse_args(args):
 if __name__ == "__main__":
     args = parse_args(sys.argv[1:])
     command = build_docker_command()
-    for e in args.env:
+    for e in args.env or []:
         x = e.split('=')
         command.add_env_var(x[0], x[1])
-    r = run(command.command + [args.image] + args.command).returncode
+    username = os.getlogin()
+    container_name = '-'.join([username, args.image, str(uuid.uuid1())])
+    set_tmux_option('tmux_docker_container', container_name)
+    r = run(command.command + ['--name', container_name, args.image] + args.command).returncode
+    set_tmux_option('tmux_docker_container')
     exit(r)
