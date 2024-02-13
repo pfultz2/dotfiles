@@ -1,0 +1,38 @@
+#!/usr/bin/python3
+
+import argparse, subprocess, os, shlex, sys, grp, uuid
+import shutil
+
+def show_command(cmd):
+    print(shlex.join(cmd), file=sys.stderr)
+
+def run(cmd, *args, **kwargs):
+    cmd2 = [cmd[0] if os.path.exists(cmd[0]) else shutil.which(cmd[0])] + cmd[1:]
+    # show_command(cmd2)
+    return subprocess.run(cmd2, *args, **kwargs)
+
+def get_tmux_option(var, pane_id):
+    tmux = shutil.which('tmux')
+    if not tmux:
+        return None
+    tmux_var = '@'+var+'_'+pane_id
+    cp = run([tmux, 'show', '-v', tmux_var], capture_output=True, text=True)
+    return str(cp.stdout.strip())
+
+def main(args):
+    container_name = get_tmux_option('tmux_docker_container', args.pane)
+    if not container_name:
+        # print("No container_name")
+        run(args.command)
+        return
+    return run(['docker', 'exec', container_name, 'bash', '-ic', shlex.join(args.command)]).returncode
+
+def parse_args(args):
+    parser = argparse.ArgumentParser("tmux-auto-attach-docker")
+    parser.add_argument('-p', '--pane', help='Pane id')
+    parser.add_argument('command', nargs=argparse.REMAINDER)
+    return parser.parse_args(args)
+
+if __name__ == "__main__":
+    r = main(parse_args(sys.argv[1:]))
+    exit(r)
