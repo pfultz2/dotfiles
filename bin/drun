@@ -58,6 +58,7 @@ def build_docker_command():
     command.add_mount('~/.ssh', f'{docker_home}/.ssh')
     command.add_mount('~/.ccache', '/ccache')
     command.add_mount('~/onnx', '/onnx')
+    command.add_mount('/mnt/nas_share/', '/nas_share')
     command.add_mount(f'{current_histfile}', '/.bash_history')
     command.add_mount(f'{current_histfile}.d', '/.bash_history.d')
     command.add_env_var('HISTFILE', '/.bash_history')
