@@ -59,13 +59,6 @@ def parse_file(f):
         pass
     return (f, 0)
 
-
-def get_docker_mount():
-    m = os.environ.get('REMOTE_DOCKER_MOUNT', None)
-    if m:
-        return m.split(':')
-    return None
-
 def tmcommand(name, args, f, line=None):
     filename = f
     if line:
