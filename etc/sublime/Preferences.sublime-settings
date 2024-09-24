@@ -50,8 +50,6 @@
 	"font_size": 12,
 	"ignored_packages":
 	[
-		"ClangComplete",
-		"LSP-yaml",
 		"Vintage",
 	],
 	"match_brackets_angle": true,
@@ -65,4 +63,5 @@
 	"auto_complete_use_history": true,
 	"auto_complete_use_index": true,
 	"show_git_status": false,
+	"index_files": true,
 }
