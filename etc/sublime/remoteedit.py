@@ -14,3 +14,13 @@ class RemoteEdit(sublime_plugin.EventListener):
             remote_path = remote.get_remote_path(host, filename)
             dst = '{}:{}'.format(host, remote_path)
             sublime.set_timeout_async(lambda: remote.rsync(filename, dst), 0)
+
+class RemotePullCommand(sublime_plugin.WindowCommand):
+    def run(self):
+        dirname = self.window.folders()[0]
+        sublime.set_timeout_async(lambda: remote.pull([dirname]), 0)
+
+class RemotePushCommand(sublime_plugin.WindowCommand):
+    def run(self):
+        dirname = self.window.folders()[0]
+        sublime.set_timeout_async(lambda: remote.push([dirname]), 0)
