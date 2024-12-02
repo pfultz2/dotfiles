@@ -1,0 +1,77 @@
+%YAML 1.2
+---
+name: migraphx
+file_extensions: [migx, mx]
+scope: source
+
+contexts:
+  numbers:
+    - match: \b(-)?(\d+)\b
+      scope: constant.numeric.integer
+    - match: \b\d+(\.)?(e-|e)?\d+(f)?\d
+      scope: meta.number.float.decimal constant.numeric.value
+      captures:
+        1: punctuation.separator.decimal
+  main:
+    - include: numbers
+    - match: \b(param|return|target_id|literal)\b
+      scope: keyword.other
+    # - match: '@'
+      # scope: punctuation.definition.variable
+    - match: '^module: "([:@\w]+)"'
+      captures:
+        1: entity.name.function
+    - match: '^[:\w]*(?:(@)\d+)?(?= =)'
+      scope: variable.other.constant
+      captures:
+        1: punctuation.definition.variable
+      # scope: punctuation.definition.variable
+      # scope: variable.other
+    - match: '(=)\s+([A-Za-z0-9_:]+)'
+      captures:
+        1: keyword.operator.assignment
+        2: variable.function
+        # 2: keyword.operator.word
+    - match: '\['
+      set: attributes
+    - match: '\('
+      set: arguments
+    - match: '#'
+      scope: punctuation.definition.comment
+      push: comments-body
+    - match: ->
+      scope: keyword.operator
+  attributes:
+    - meta_scope: meta.brackets
+    - include: numbers
+    - match: '(?<=symbol_name=)(\w+)'
+      captures:
+        1: entity.name.constant
+        # 1: entity.other.attribute-name
+        # 2: variable.other.constant
+    - match: '(\w+)(=)'
+      captures:
+        # 1: entity.other.attribute-name
+        1: variable.parameter
+        2: keyword.operator.assignment
+        # 1: constant.other
+    # - match: \b(\w+)\b
+    #   scope: constant.language
+      # scope: constant.other
+      # scope: entity.name.constant
+    - match: '\['
+      push: attributes
+    - match: ']'
+      pop: true
+  comments-body:
+    - meta_scope: comment.line.number-sign
+    - match: \n
+      pop: true
+  arguments:
+    - meta_scope: meta.parens
+    - match: '[:\w]*(?:(@)\d+)?\b'
+      scope: variable.other.constant
+      captures:
+        1: punctuation.definition.variable
+    - match: '\)'
+      pop: true
