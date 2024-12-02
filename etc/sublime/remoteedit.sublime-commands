@@ -1,0 +1,4 @@
+[
+    { "caption": "Remote: Pull", "command": "remote_pull" },
+    { "caption": "Remote: Push", "command": "remote_push" },
+]
