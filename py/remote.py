@@ -110,7 +110,7 @@ def pipe_writeline(pipe, s):
     if pipe:
         pipe.write((s + "\n").encode('utf-8'))
 
-def rsync(src, dst, exclude=None, delete=False, shallow=False, quiet=False, **kwargs):
+def rsync(src, dst, exclude=None, delete=False, shallow=False, quiet=False, show=False, **kwargs):
     cmd = [shutil.which('rsync'), '--times', '--compress']
     if quiet:
         cmd.append('--quiet')
@@ -136,7 +136,8 @@ def rsync(src, dst, exclude=None, delete=False, shallow=False, quiet=False, **kw
     else:
         cmd.append(src)
         cmd.append(dst)
-    # print(' '.join(cmd))
+    if show:
+        print(' '.join(cmd))
     return subprocess.run(cmd, **kwargs).returncode
 
 def remote_sync(args, f, pipe=None):

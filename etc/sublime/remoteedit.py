@@ -13,7 +13,7 @@ class RemoteEdit(sublime_plugin.EventListener):
         if remote.needs_sync(host):
             remote_path = remote.get_remote_path(host, filename)
             dst = '{}:{}'.format(host, remote_path)
-            sublime.set_timeout_async(lambda: remote.rsync(filename, dst), 0)
+            sublime.set_timeout_async(lambda: remote.rsync(filename, dst, show=True), 0)
 
 class RemotePullCommand(sublime_plugin.WindowCommand):
     def run(self):
