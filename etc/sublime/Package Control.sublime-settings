@@ -23,6 +23,7 @@
 		"INI",
 		"LLVM",
 		"LSP",
+		"LSP-copilot",
 		"LSP-dockerfile",
 		"LSP-json",
 		"LSP-pyright",
