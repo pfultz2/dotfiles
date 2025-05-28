@@ -37,5 +37,8 @@ if __name__ == "__main__":
     if 'SUBLIME_REMOTE_PORT' in os.environ:
         port = int(os.environ['SUBLIME_REMOTE_PORT'])
     args = [transform_arg(arg) for arg in sys.argv[1:]]
-    print("Port", port)
-    netcat('localhost', port, ' '.join(args) + "\n")
+    if args[0] == 'show':
+        print(shlex.join(args[1:]))
+    else:
+        print("Port", port)
+        netcat('localhost', port, ' '.join(args) + "\n")
