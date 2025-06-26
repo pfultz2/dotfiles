@@ -1,8 +1,11 @@
 {
+	"debug": true,
 	"bootstrapped": true,
-	"in_process_packages":
-	[
-	],
+	"downloader_precedence": {
+		"windows": ["wininet", "oscrypto"],
+		"osx": ["urllib", "oscrypto", "curl"],
+		"linux": ["curl", "urllib", "oscrypto", "wget"],
+	},
 	"installed_packages":
 	[
 		"Agila Theme",
@@ -56,5 +59,8 @@
 		"Tmux Syntax Highlight",
 		"x86 and x86_64 Assembly",
 		"Zeal",
+	],
+	"in_process_packages":
+	[
 	],
 }
