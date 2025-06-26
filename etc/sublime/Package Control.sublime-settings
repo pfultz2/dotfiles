@@ -1,5 +1,4 @@
 {
-	"debug": true,
 	"bootstrapped": true,
 	"downloader_precedence": {
 		"windows": ["wininet", "oscrypto"],
