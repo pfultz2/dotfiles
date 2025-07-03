@@ -1,0 +1,8 @@
+repo="$1"
+branch="main"
+
+curl -s "https://huggingface.co/api/models/$repo" \
+  | jq -r '.siblings[].rfilename' \
+  | xargs -I{} wget -c -x -nH --cut-dirs=4 \
+      "https://huggingface.co/$repo/resolve/$branch/{}"
+
