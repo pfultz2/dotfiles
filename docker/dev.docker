@@ -8,6 +8,7 @@ RUN apt-get install -y \
     bash-completion \
     build-essential \
     bc \
+    cargo \
     ccache \
     cmake \
     cmake-curses-gui \
@@ -24,6 +25,7 @@ RUN apt-get install -y \
     make \
     man-db \
     nano \
+    npm \
     python3-dev \
     python3-pip \
     ssh \
@@ -46,6 +48,11 @@ RUN apt-get install -y python-dev \
     || echo
 
 RUN pip install cget backports.lzma
+
+# Manually install codex binaries
+RUN curl -fsSL "https://github.com/openai/codex/releases/download/rust-v0.23.0/codex-x86_64-unknown-linux-musl.tar.gz" \
+    | tar -xz -C /usr/local/bin && \
+    ln -s /usr/local/bin/codex-x86_64-* /usr/local/bin/codex && chmod +x /usr/local/bin/codex
 
 # Install vscode
 RUN wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
