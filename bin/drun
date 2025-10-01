@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import argparse, json, subprocess, os, shlex, shutil, sys, grp, uuid
+import argparse, json, subprocess, os, shlex, shutil, sys, grp, uuid, re
 
 def show_command(cmd):
     print(shlex.join(cmd), file=sys.stderr)
@@ -8,6 +8,9 @@ def show_command(cmd):
 def run(cmd, *args, **kwargs):
     show_command(cmd)
     return subprocess.run(cmd, *args, **kwargs)
+
+def sanitize_container_name(name):
+    return re.sub(r'[^a-zA-Z0-9_.-]', '_', name)
 
 class DockerRunCommandBuilder:
     def __init__(self):
@@ -116,7 +119,7 @@ if __name__ == "__main__":
         for m in config['mount']:
             command.add_mount(m[0], m[1])
     username = os.getlogin()
-    container_name = '-'.join([username, args.image, str(uuid.uuid1())])
+    container_name = sanitize_container_name('-'.join([username, args.image, str(uuid.uuid1())]))
     set_tmux_option('tmux_docker_container', container_name)
     r = run(command.command + user_args + ['--name', container_name, args.image] + args.command).returncode
     set_tmux_option('tmux_docker_container')
