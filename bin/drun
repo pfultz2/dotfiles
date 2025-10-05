@@ -69,6 +69,10 @@ def build_docker_command():
     command.add_mount('~/.codex', '/.codex')
     command.add_env_var('CODEX_HOME', '/.codex')
 
+    if os.path.exists(os.path.expanduser('~/.gh_token')):
+        with open(os.path.expanduser('~/.gh_token')) as f:
+            token = f.read().strip()
+            command.add_env_var('GH_TOKEN', token)
 
     if os.path.exists('/tmp/.X11-unix/'):
         for d in os.listdir('/tmp/.X11-unix/'):

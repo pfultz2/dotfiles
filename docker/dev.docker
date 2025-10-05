@@ -47,12 +47,14 @@ RUN apt-get install -y python-dev \
     tilde \
     || echo
 
-RUN pip install cget backports.lzma
+RUN npm cache clean -f
+RUN npm install -g n
+RUN n 22
 
-# Manually install codex binaries
-RUN curl -fsSL "https://github.com/openai/codex/releases/download/rust-v0.23.0/codex-x86_64-unknown-linux-musl.tar.gz" \
-    | tar -xz -C /usr/local/bin && \
-    ln -s /usr/local/bin/codex-x86_64-* /usr/local/bin/codex && chmod +x /usr/local/bin/codex
+RUN npm install -g @github/copilot
+RUN npm install -g @openai/codex
+
+RUN pip install cget backports.lzma
 
 # Install vscode
 RUN wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
