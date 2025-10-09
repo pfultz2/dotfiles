@@ -68,6 +68,7 @@ RUN mkdir -p /data
 RUN mkdir -p /ccache
 RUN mkdir -p /.bash_history.d
 ENV CCACHE_DIR=/ccache
+ENV CLAUDE_CONFIG_DIR=/claude
 
 RUN groupadd --force --gid ${group_id} ${username}
 RUN useradd --non-unique --create-home --shell /bin/bash -u ${user_id} --gid ${group_id} ${username}
