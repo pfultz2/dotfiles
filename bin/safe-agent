@@ -86,8 +86,8 @@ class SnapshotManager:
         self.tag = args.tag or default_tag(self.src)
         self.project_dir = os.path.join(self.base, self.tag)
         self.latest_link = os.path.join(self.project_dir, "latest")
-        ensure_dir(self.project_dir)
-
+        ensure_dir(self.latest_link)
+        
     def get_snapshots(self):
         entries = sorted(os.listdir(self.project_dir))
         return [e for e in entries if e != "latest" and os.path.isdir(os.path.join(self.project_dir, e))]
