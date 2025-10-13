@@ -1,0 +1,189 @@
+#!/usr/bin/python3
+
+import argparse, shutil, shlex, subprocess, os, sys, socketserver, threading, json
+from datetime import datetime
+from pathlib import Path
+from typing import List, Optional, Tuple
+
+exclude_sync = [
+    '.hg',
+    '.git',
+    '.tox',
+    '*.co',
+    '*.deb',
+    '*.rpm',
+    "*.a1",
+    "*.a2",
+    "*.a4",
+    "*.a5",
+    "*.jpg",
+    "*.jpeg",
+    "*.png",
+    "*.gif",
+    "*.ttf",
+    "*.tga",
+    "*.dds",
+    "*.ico",
+    "*.eot",
+    "*.pdf",
+    "*.swf",
+    "*.jar",
+    "*.zip",
+    "*.dll",
+    "*.obj",
+    "*.o",
+    "*.a",
+    "*.lib",
+    "*.so",
+    "*.so.*",
+    "*.dylib",
+    '.cache/',
+    'bin/'
+]
+
+__commands__ = {}
+def command(f):
+    __commands__[f.__name__] = f
+    return f
+
+def ensure_dir(p: str) -> None:
+    os.makedirs(p, exist_ok=True)
+
+def rsync_snapshot(src: str, dst: str, exclude: Optional[List[str]]=None, linkdest:Optional[str]=None, show:bool=False) -> int:
+    cmd = [shutil.which('rsync'), "-a", "--delete"]
+    if linkdest:
+        cmd.append(f"--link-dest={linkdest}")
+    for e in exclude or []:
+        cmd.append('--exclude')
+        cmd.append(e)
+    cmd.extend([src + "/", dst + "/"])
+    if show:
+        print(' '.join(cmd))
+    return subprocess.run(cmd, check=True).returncode
+
+
+def default_src() -> str:
+    return os.getcwd()
+
+def default_base() -> str:
+    return os.environ.get("SAFE_AGENT_BASE", "/backup/safe-agent")
+
+def default_tag(src: str) -> str:
+    return os.environ.get("SAFE_AGENT_TAG", src)
+
+
+def make_arg_parse():
+    p = argparse.ArgumentParser()
+    p.add_argument("--src", "-s", default=default_src(), help="Workspace root to protect (default: %(default)s)")
+    p.add_argument("--base", "-b", default=default_base(), help="Backup root where snapshots live (default: %(default)s)")
+    p.add_argument("--tag", "-t", default=None, help="Project/tag name under BASE")
+    return p
+
+class SnapshotManager:
+    def __init__(self, args: argparse.Namespace):
+        self.src = os.path.abspath(args.src)
+        self.base = os.path.abspath(args.base)
+        self.tag = args.tag or default_tag(self.src)
+        self.project_dir = os.path.join(self.base, self.tag)
+        self.latest_link = os.path.join(self.project_dir, "latest")
+        ensure_dir(self.project_dir)
+
+    def get_snapshots(self):
+        entries = sorted(os.listdir(self.project_dir))
+        return [e for e in entries if e != "latest" and os.path.isdir(os.path.join(self.project_dir, e))]
+
+
+    def save(self):
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        dst = os.path.join(self.project_dir, timestamp)
+        print(f"Creating snapshot: {dst}")
+        rsync_snapshot(self.src, dst, exclude=exclude_sync, linkdest=self.latest_link, show=True)
+
+
+    def list(self):
+        print(f"{self.latest_link}")
+        for d in self.get_snapshots():
+            print(d)
+
+    def prune(self, keep: int = 1):
+        dirs = self.get_snapshots()
+        to_delete = dirs[:-keep] if keep < len(dirs) else []
+        # Ask for confirmation to delete
+        if not to_delete:
+            print("No snapshots to delete.")
+            return
+        print(f"Keeping {keep} snapshots, deleting {len(to_delete)}:")
+        for d in to_delete:
+            print(f"  {d}")
+        confirm = input("Are you sure? (y/N) ")
+        if confirm.lower() != 'y':
+            print("Canceled.")
+            return
+        for d in to_delete:
+            path = os.path.join(self.project_dir, d)
+            print(f"Deleting snapshot: {path}")
+            shutil.rmtree(path)
+
+    def restore(self, n: Optional[int] = None):
+        dirs = self.get_snapshots()
+        snap = None
+        if n == None:
+            snap = self.latest_link
+        else:
+            if n < 0 or n >= len(dirs):
+                print(f"Invalid snapshot index {n}. Available snapshots:")
+                self.list()
+                exit(1)
+            snap = dirs[n]
+
+        print(f"Restoring snapshot {snap} to {self.src}")
+        rsync_snapshot(snap, self.src, exclude=exclude_sync, show=True)
+
+    def diff(self):
+        cmd = [shutil.which('diff'), '-r', '-q', self.src, self.latest_link]
+        subprocess.run(cmd, check=True)
+
+
+@command
+def run(iargs: List[str]) -> int:
+    p = make_arg_parse()
+    p.add_argument("command", nargs=argparse.REMAINDER, help="Command to run")
+    args = p.parse_args(iargs)
+    if not args.command:
+        print("No command specified.")
+        return 1
+    sm = SnapshotManager(args)
+    sm.save()
+    subprocess.run(args.command, cwd=args.src, check=True)
+    return 0
+
+@command
+def save(iargs: List[str]) -> int:
+    p = make_arg_parse()
+    args = p.parse_args(iargs)
+    sm = SnapshotManager(args)
+    sm.save()
+    return 0
+
+@command
+def prune(iargs: List[str]) -> int:
+    p = make_arg_parse()
+    p.add_argument("--keep", "-k", type=int, default=1, help="Number of snapshots to keep (default: %(default)s)")
+    args = p.parse_args(iargs)
+    sm = SnapshotManager(args)
+    sm.prune(keep=args.keep)
+    return 0
+
+@command
+def list(iargs: List[str]) -> int:
+    p = make_arg_parse()
+    args = p.parse_args(iargs)
+    sm = SnapshotManager(args)
+    sm.list()
+    return 0
+
+if __name__ == "__main__":
+    cmd = sys.argv[1]
+    r = __commands__[cmd](sys.argv[2:])
+    exit(r)
+
