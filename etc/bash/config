@@ -157,8 +157,8 @@ if [ $UNIX ]; then
     fi
 else
     export CURRENT_HISTFILE=$HISTFILE
-    shopt -s histappend
-    PROMPT_COMMAND="history -a;$PROMPT_COMMAND"
+    # shopt -s histappend
+    # PROMPT_COMMAND="history -a;$PROMPT_COMMAND"
 fi
 
 # Always use nano for crontab
