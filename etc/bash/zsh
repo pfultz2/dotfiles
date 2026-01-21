@@ -118,3 +118,6 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+# Make ctr-W work like it does in bash
+WORDCHARS='~!#$%^&*(){}[]<>?.+;-_/\|=@`'

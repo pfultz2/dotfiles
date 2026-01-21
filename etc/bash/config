@@ -43,18 +43,6 @@ fi
 # colored GCC warnings and errors
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
-if [[ "$BASH_VERSION" ]]; then
-    # pip bash completion start
-    _pip_completion()
-    {
-        COMPREPLY=( $( COMP_WORDS="${COMP_WORDS[*]}" \
-                       COMP_CWORD=$COMP_CWORD \
-                       PIP_AUTO_COMPLETE=1 $1 ) )
-    }
-    complete -o default -F _pip_completion pip
-    # pip bash completion end
-fi
-
 alias cpm='cget -p ~/usr'
 
 # TODO: Make this a script
@@ -86,6 +74,8 @@ alias et-subl='et -r 52698:52698'
 alias restart-pane='tmux respawn-pane -k'
 alias update-env='eval $(tmux showenv -s)'
 
+alias rocdebug='/opt/rocm/bin/rocgdb -batch -ex r -ex bt --args'
+
 function mosh-subl {
     # stty -tostop
     trap 'kill $BGPID; exit' INT
@@ -97,72 +87,78 @@ function mosh-subl {
 
 alias vr='venv-run'
 
-if type -p lsd > /dev/null ; then
-    alias ls='lsd'
-fi
+if [ $UNIX ]; then
+    if type -p lsd > /dev/null ; then
+        alias ls='lsd'
+    fi
 
-# Persistent bash history for screen/tmux sessions
-if [[ $TERM == screen* ]]; then
-   mkdir -p $HISTFILE.d/
-   if [ -n "$TMUX" ]; then
-      declare SCREEN_NAME=$(tmux display-message -p '#S')
-      declare WINDOW=$(tmux display-message -p '#I')
+    # Persistent bash history for screen/tmux sessions
+    if [[ $TERM == screen* ]]; then
+       mkdir -p $HISTFILE.d/
+       if [ -n "$TMUX" ]; then
+          declare SCREEN_NAME=$(tmux display-message -p '#S')
+          declare WINDOW=$(tmux display-message -p '#I')
+        else
+          declare SCREEN_NAME=$(echo $STY | sed -nr 's/[^.]*\.(.*)/\1/p')
+       fi
+       if [[ $SCREEN_NAME ]]; then
+           HISTFILE="${HISTFILE}.d/${SCREEN_NAME}.${WINDOW}"
+           declare -p HISTFILE
+       fi
+       # Persistent cwd
+       PWD_FILE="$HISTFILE.pwd"
+       [ -s $PWD_FILE ] && cd `cat $PWD_FILE`
+       PROMPT_COMMAND="pwd > $PWD_FILE;$PROMPT_COMMAND"
+    # Persistent bash history for vscode sessions
+    elif [[ $TERM_PROGRAM == vscode ]]; then
+        mkdir -p $HISTFILE.d/
+        HISTFILE="${HISTFILE}.d/$(basename $(pwd)).vscode"
+    fi
+    touch $HISTFILE
+    if type -p mcfly > /dev/null ; then
+        # Clear history file
+        rm "${MCFLY_HISTORY}"
+        if [[ "$BASH_VERSION" ]]; then
+            eval "$(mcfly init bash)"
+        fi
+        if [[ "$ZSH_VERSION" ]]; then
+            eval "$(mcfly init zsh)"
+        fi
+    elif type -p hstr > /dev/null ; then
+        eval "$(hstr --show-configuration)"
     else
-      declare SCREEN_NAME=$(echo $STY | sed -nr 's/[^.]*\.(.*)/\1/p')
-   fi
-   if [[ $SCREEN_NAME ]]; then
-       HISTFILE="${HISTFILE}.d/${SCREEN_NAME}.${WINDOW}"
-       declare -p HISTFILE
-   fi
-   # Persistent cwd
-   PWD_FILE="$HISTFILE.pwd"
-   [ -s $PWD_FILE ] && cd `cat $PWD_FILE`
-   PROMPT_COMMAND="pwd > $PWD_FILE;$PROMPT_COMMAND"
-# Persistent bash history for vscode sessions
-elif [[ $TERM_PROGRAM == vscode ]]; then
-    mkdir -p $HISTFILE.d/
-    HISTFILE="${HISTFILE}.d/$(basename $(pwd)).vscode"
-fi
-touch $HISTFILE
-if type -p mcfly > /dev/null ; then
-    # Clear history file
-    rm "${MCFLY_HISTORY}"
-    if [[ "$BASH_VERSION" ]]; then
-        eval "$(mcfly init bash)"
+        if [[ "$BASH_VERSION" ]]; then
+            shopt -s histappend
+            PROMPT_COMMAND="history -a;$PROMPT_COMMAND"
+            bind -x '"\C-r": __history_fuzzy_search'
+            __history_fuzzy_search() {
+                READLINE_LINE=$(
+                    HISTTIMEFORMAT=
+                    history | sort -rn \
+                        | awk '{ $1="" ; if (!x[$0]++) print substr($0,2) }' \
+                        | fzy -q "$READLINE_LINE")
+                READLINE_POINT=0x7FFFFFFF
+            }
+        fi
+        if [[ "$ZSH_VERSION" ]]; then
+            setopt APPEND_HISTORY
+        fi
     fi
-    if [[ "$ZSH_VERSION" ]]; then
-        eval "$(mcfly init zsh)"
-    fi
-elif type -p hstr > /dev/null ; then
-    eval "$(hstr --show-configuration)"
-else
-    if [[ "$BASH_VERSION" ]]; then
-        shopt -s histappend
-        PROMPT_COMMAND="history -a;$PROMPT_COMMAND"
-        bind -x '"\C-r": __history_fuzzy_search'
-        __history_fuzzy_search() {
-            READLINE_LINE=$(
-                HISTTIMEFORMAT=
-                history | sort -rn \
-                    | awk '{ $1="" ; if (!x[$0]++) print substr($0,2) }' \
-                    | fzy -q "$READLINE_LINE")
-            READLINE_POINT=0x7FFFFFFF
+    export CURRENT_HISTFILE=$HISTFILE
+
+    if [ -n "$TMUX" ]; then
+        function refresh_tmux_env {
+            eval "$(tmux showenv -s)"
+        }
+    else
+        function refresh_tmux_env {
+            echo > /dev/null
         }
     fi
-    if [[ "$ZSH_VERSION" ]]; then
-        setopt APPEND_HISTORY
-    fi
-fi
-export CURRENT_HISTFILE=$HISTFILE
-
-if [ -n "$TMUX" ]; then
-    function refresh_tmux_env {
-        eval "$(tmux showenv -s)"
-    }
 else
-    function refresh_tmux_env {
-        echo > /dev/null
-    }
+    export CURRENT_HISTFILE=$HISTFILE
+    shopt -s histappend
+    PROMPT_COMMAND="history -a;$PROMPT_COMMAND"
 fi
 
 # Always use nano for crontab
@@ -172,7 +168,19 @@ alias e=edit
 
 export EDITOR='edit -w'
 
-if [[ "$BASH_VERSION" ]]; then
+
+if [ $UNIX ]; then
+    if [[ "$BASH_VERSION" ]]; then
+        # pip bash completion start
+        _pip_completion()
+        {
+            COMPREPLY=( $( COMP_WORDS="${COMP_WORDS[*]}" \
+                           COMP_CWORD=$COMP_CWORD \
+                           PIP_AUTO_COMPLETE=1 $1 ) )
+        }
+        complete -o default -F _pip_completion pip
+        # pip bash completion end
+    fi
     for i in $DOTFILES/etc/bash/completions/*; do
         if [ -f $i ]; then
             . $i
@@ -183,26 +191,29 @@ fi
 source $DOTFILES/etc/bash/colors
 source $DOTFILES/etc/bash/functions
 
-function preexec {                                                                                    
-    refresh_tmux_env
-    cmd_start="$SECONDS"
-}
-function precmd {
-    local cmd_end="$SECONDS"
-    export LAST_COMMAND_ELAPSED_SECONDS=$((cmd_end-cmd_start))
-}
-
-if [[ "$BASH_VERSION" ]]; then
-    preexec_invoke_exec () {
-        [ -n "$COMP_LINE" ] && return  # do nothing if completing
-        [ "$BASH_COMMAND" = "$PROMPT_COMMAND" ] && return # don't cause a preexec for $PROMPT_COMMAND
-        preexec
+if [ $UNIX ]; then
+    function preexec {                                                                                    
+        refresh_tmux_env
+        cmd_start="$SECONDS"
     }
-    trap 'preexec_invoke_exec' DEBUG
+    function precmd {
+        local cmd_end="$SECONDS"
+        export LAST_COMMAND_ELAPSED_SECONDS=$((cmd_end-cmd_start))
+    }
+
+    if [[ "$BASH_VERSION" ]]; then
+        preexec_invoke_exec () {
+            [ -n "$COMP_LINE" ] && return  # do nothing if completing
+            [ "$BASH_COMMAND" = "$PROMPT_COMMAND" ] && return # don't cause a preexec for $PROMPT_COMMAND
+            preexec
+        }
+        trap 'preexec_invoke_exec' DEBUG
+    fi
+
+    [[ $- == *i* ]] && PROMPT_COMMAND="precmd;$PROMPT_COMMAND"
 fi
 
 [[ $- == *i* ]] && source $DOTFILES/etc/bash/prompt
-[[ $- == *i* ]] && PROMPT_COMMAND="precmd;$PROMPT_COMMAND"
 # [[ $- == *i* ]] && precmd_functions=(refresh_tmux_env)
 
 if [[ "$BASH_VERSION" ]]; then
