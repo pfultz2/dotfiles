@@ -58,6 +58,7 @@ def build_docker_command():
     
     command.propagate_env_vars(['RMATE_PORT', 'SUBLIME_REMOTE_PORT'])
     command.add_mount('~/.ssh', f'{docker_home}/.ssh')
+    command.add_mount('~/bin', f'{docker_home}/bin')
     command.add_mount('~/.ccache', '/ccache')
     command.add_mount('~/.claude', '/claude')
     command.add_mount('~/backup', '/backup')
