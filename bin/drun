@@ -56,7 +56,7 @@ def build_docker_command():
     command.add_arg('-w', '/data')
     command.add_env_var('REMOTE_DOCKER_MOUNT', f'/data:{cwd}')
     
-    command.propagate_env_vars(['RMATE_PORT', 'SUBLIME_REMOTE_PORT'])
+    command.propagate_env_vars(['RMATE_PORT', 'SUBLIME_REMOTE_PORT', 'BROWSER'])
     command.add_mount('~/.ssh', f'{docker_home}/.ssh')
     command.add_mount('~/bin', f'{docker_home}/bin')
     command.add_mount('~/.ccache', '/ccache')

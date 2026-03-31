@@ -115,6 +115,7 @@ def bash_command(remote_port=None, rmate_port=None, cwd=None):
         cd = ['cd', cwd, ';']
     return cd + rempty([
         'env',
+        "BROWSER='dest firefox'",
         rformat('RMATE_PORT={}', rmate_port or DEFAULT_RMATE_PORT),
         rformat('SUBLIME_REMOTE_PORT={}', remote_port), '$SHELL', '-il'
     ])
