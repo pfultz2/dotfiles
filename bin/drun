@@ -20,8 +20,10 @@ class DockerRunCommandBuilder:
         for arg in args:
             self.command.append(arg)
 
-    def add_mount(self, host_path, container_path=None):
+    def add_mount(self, host_path, container_path=None, always=False):
         host_path2 = os.path.expanduser(host_path)
+        if not os.path.exists(host_path2) and always:
+            os.makedirs(host_path2)
         if os.path.exists(host_path2):
             container_path2 = container_path or host_path2
             self.add_arg(f'-v={host_path2}:{container_path2}')
@@ -59,8 +61,9 @@ def build_docker_command():
     command.propagate_env_vars(['RMATE_PORT', 'SUBLIME_REMOTE_PORT', 'BROWSER'])
     command.add_mount('~/.ssh', f'{docker_home}/.ssh')
     command.add_mount('~/bin', f'{docker_home}/bin')
-    command.add_mount('~/.ccache', '/ccache')
+    command.add_mount('~/.ccache', '/ccache', always=True)
     command.add_mount('~/.claude', '/claude')
+    command.add_mount('~/.config/gh', '/gh')
     command.add_mount('~/backup', '/backup')
     command.add_mount('~/onnx', '/onnx')
     command.add_mount('/mnt/nas_share/', '/nas_share')

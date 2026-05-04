@@ -3,6 +3,17 @@ FROM ${docker_base}
 # Workaround https://unix.stackexchange.com/questions/2544/how-to-work-around-release-file-expired-problem-on-a-local-mirror
 RUN echo "Acquire::Check-Valid-Until \"false\";\nAcquire::Check-Date \"false\";" | cat > /etc/apt/apt.conf.d/10no--check-valid-until
 
+RUN mkdir -p -m 755 /etc/apt/keyrings
+RUN wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+    | tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+RUN chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+
+# Add GitHub CLI APT repository
+RUN echo "deb [arch=$(dpkg --print-architecture) \
+    signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] \
+    https://cli.github.com/packages stable main" \
+    | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+
 RUN apt-get update
 RUN apt-get install -y \
     bash-completion \
@@ -15,6 +26,7 @@ RUN apt-get install -y \
     curl \
     fzy \
     gettext \
+    gh \
     git \
     gpg \
     iputils-ping \
@@ -70,6 +82,7 @@ RUN mkdir -p /ccache
 RUN mkdir -p /.bash_history.d
 ENV CCACHE_DIR=/ccache
 ENV CLAUDE_CONFIG_DIR=/claude
+ENV GH_CONFIG_DIR=/gh
 
 RUN groupadd --force --gid ${group_id} ${username}
 RUN useradd --non-unique --create-home --shell /bin/bash -u ${user_id} --gid ${group_id} ${username}
