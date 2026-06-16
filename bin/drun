@@ -111,6 +111,7 @@ def set_tmux_option(var, value=None):
 def parse_args(args):
     parser = argparse.ArgumentParser("drun")
     parser.add_argument('-e', '--env', action='append')
+    parser.add_argument('-l', '--local', action='store_true')
     parser.add_argument('image')
     parser.add_argument('command', nargs=argparse.REMAINDER)
     return parser.parse_args(args)
@@ -131,6 +132,9 @@ if __name__ == "__main__":
         for m in config['mount']:
             command.add_mount(m[0], m[1])
     username = os.getlogin()
+    userid = os.getuid()
+    if args.local:
+        command.add_arg('--user', str(userid))
     container_name = sanitize_container_name('-'.join([username, args.image, str(uuid.uuid1())]))
     set_tmux_option('tmux_docker_container', container_name)
     r = run(command.command + user_args + ['--name', container_name, args.image] + args.command).returncode
