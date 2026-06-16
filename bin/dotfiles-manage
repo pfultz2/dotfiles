@@ -43,6 +43,9 @@ def main():
     dest = args.path if os.path.isabs(args.path) \
         else os.path.join(DOTFILES, args.path)
     dest = os.path.normpath(dest)
+    # When the destination is a directory, move the file into it by its name.
+    if os.path.isdir(dest):
+        dest = os.path.join(dest, os.path.basename(src))
     if os.path.lexists(dest):
         sys.exit('error: {} already exists'.format(dest))
 
