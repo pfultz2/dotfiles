@@ -1,0 +1,66 @@
+#!/usr/bin/env python3
+"""Move a file into the dotfiles repo, replace it with a symlink, and record
+the link in setup/link.sh so it can be recreated on a fresh setup.
+
+Usage:
+    dotfiles-manage <file> <path-in-dotfiles>
+
+Example:
+    dotfiles-manage ~/.vimrc etc/.vimrc
+"""
+
+import argparse, os, shutil, sys
+
+DOTFILES = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+LINK_SCRIPT = os.path.join(DOTFILES, 'setup', 'link.sh')
+
+
+def abspath(f):
+    return os.path.abspath(os.path.expanduser(f))
+
+
+def home_relative(f):
+    """Express a path relative to ~ when it lives under home, else absolute."""
+    home = os.path.expanduser('~')
+    if f == home or f.startswith(home + os.sep):
+        return '~' + f[len(home):]
+    return f
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('file', help='the existing file to manage')
+    parser.add_argument('path',
+        help='destination path inside the dotfiles repo (relative to its root)')
+    args = parser.parse_args()
+
+    src = abspath(args.file)
+    if not os.path.lexists(src):
+        sys.exit('error: {} does not exist'.format(src))
+
+    # Resolve the destination inside the dotfiles repo.
+    dest = args.path if os.path.isabs(args.path) \
+        else os.path.join(DOTFILES, args.path)
+    dest = os.path.normpath(dest)
+    if os.path.lexists(dest):
+        sys.exit('error: {} already exists'.format(dest))
+
+    # Move the file into the dotfiles repo and replace it with a symlink.
+    os.makedirs(os.path.dirname(dest), exist_ok=True)
+    shutil.move(src, dest)
+    os.symlink(dest, src)
+    print('Moved {} -> {}'.format(src, dest))
+
+    # Record the link in setup/link.sh so a fresh setup recreates it.
+    rel = os.path.relpath(dest, DOTFILES)
+    target = home_relative(src)
+    with open(LINK_SCRIPT, 'a') as f:
+        f.write('\n')
+        f.write('echo "Link {}"\n'.format(os.path.basename(src)))
+        f.write('ln -s $DOTFILES/{} {}\n'.format(rel, target))
+    print('Appended link to {}'.format(LINK_SCRIPT))
+
+
+if __name__ == '__main__':
+    main()

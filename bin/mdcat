@@ -1,0 +1,373 @@
+#!/usr/bin/python3
+
+"""Render markdown as ANSI-formatted text with colors, tables, and pretty printing."""
+
+import os
+import re
+import sys
+
+
+# ANSI escape codes
+RESET = '\033[0m'
+BOLD = '\033[1m'
+DIM = '\033[2m'
+ITALIC = '\033[3m'
+UNDERLINE = '\033[4m'
+REVERSE = '\033[7m'
+STRIKETHROUGH = '\033[9m'
+
+RED = '\033[31m'
+GREEN = '\033[32m'
+YELLOW = '\033[33m'
+BLUE = '\033[34m'
+MAGENTA = '\033[35m'
+CYAN = '\033[36m'
+
+BR_BLACK = '\033[90m'
+BR_RED = '\033[91m'
+BR_GREEN = '\033[92m'
+BR_YELLOW = '\033[93m'
+BR_BLUE = '\033[94m'
+BR_MAGENTA = '\033[95m'
+BR_CYAN = '\033[96m'
+BR_WHITE = '\033[97m'
+
+BG_BR_BLACK = '\033[100m'
+
+HEADER_STYLES = [
+    BOLD + BR_MAGENTA,
+    BOLD + BR_CYAN,
+    BOLD + BR_GREEN,
+    BOLD + BR_YELLOW,
+    BOLD + BR_BLUE,
+    BOLD + BR_WHITE,
+]
+
+
+def term_width():
+    try:
+        return os.get_terminal_size().columns
+    except OSError:
+        return 80
+
+
+def strip_ansi(text):
+    return re.sub(r'\033\[[0-9;]*m', '', text)
+
+
+def visible_len(text):
+    return len(strip_ansi(text))
+
+
+def pad_to(text, width, align='left'):
+    vlen = visible_len(text)
+    space = max(0, width - vlen)
+    if align == 'right':
+        return ' ' * space + text
+    elif align == 'center':
+        l = space // 2
+        return ' ' * l + text + ' ' * (space - l)
+    return text + ' ' * space
+
+
+def render_inline(text):
+    """Apply inline markdown formatting with ANSI codes."""
+    # Handle code spans first to protect their contents
+    result = ''
+    parts = re.split(r'(`+)', text)
+    in_code = False
+    code_delim = ''
+    code_buf = ''
+    for part in parts:
+        if not in_code:
+            if re.match(r'^`+$', part):
+                in_code = True
+                code_delim = part
+                code_buf = ''
+            else:
+                result += part
+        else:
+            if part == code_delim:
+                result += f'{BG_BR_BLACK}{BR_WHITE} {code_buf} {RESET}'
+                in_code = False
+            else:
+                code_buf += part
+    if in_code:
+        result += code_delim + code_buf
+    text = result
+
+    # Bold + italic
+    text = re.sub(r'\*\*\*(.+?)\*\*\*', rf'{BOLD}{ITALIC}\1{RESET}', text)
+    # Bold
+    text = re.sub(r'\*\*(.+?)\*\*', rf'{BOLD}\1{RESET}', text)
+    text = re.sub(r'__(.+?)__', rf'{BOLD}\1{RESET}', text)
+    # Italic
+    text = re.sub(r'\*(.+?)\*', rf'{ITALIC}\1{RESET}', text)
+    text = re.sub(r'(?<!\w)_(.+?)_(?!\w)', rf'{ITALIC}\1{RESET}', text)
+    # Strikethrough
+    text = re.sub(r'~~(.+?)~~', rf'{STRIKETHROUGH}\1{RESET}', text)
+    # Images
+    text = re.sub(r'!\[([^\]]*)\]\([^)]+\)', rf'{DIM}[image: \1]{RESET}', text)
+    # Links
+    text = re.sub(
+        r'\[([^\]]+)\]\(([^)]+)\)',
+        rf'{UNDERLINE}{BLUE}\1{RESET} {DIM}(\2){RESET}',
+        text,
+    )
+
+    return text
+
+
+def render_header(level, text, width):
+    style = HEADER_STYLES[min(level - 1, len(HEADER_STYLES) - 1)]
+    text = render_inline(text)
+    if level == 1:
+        bar = style + '━' * width + RESET
+        return f'\n{bar}\n{style}  {text}{RESET}\n{bar}'
+    if level == 2:
+        bar = style + '─' * width + RESET
+        return f'\n{style}  {text}{RESET}\n{bar}'
+    prefix = style + '▎' + ' ' * (level - 3)
+    return f'\n{prefix} {text}{RESET}'
+
+
+def render_code_block(code_lines, language):
+    width = term_width()
+    parts = []
+    if language:
+        parts.append(f'{BG_BR_BLACK}{BR_CYAN} {language} {RESET}')
+    for line in code_lines:
+        pad = max(0, width - len(line) - 4)
+        parts.append(f'{BG_BR_BLACK}  {BR_WHITE}{line}{" " * pad}  {RESET}')
+    return '\n'.join(parts)
+
+
+def render_table(rows):
+    if not rows:
+        return ''
+
+    parsed = []
+    for row in rows:
+        cells = [c.strip() for c in row.strip().strip('|').split('|')]
+        parsed.append(cells)
+
+    # Find separator row and extract alignments
+    sep_idx = None
+    alignments = []
+    for i, cells in enumerate(parsed):
+        if all(re.match(r'^:?-+:?$', c.strip()) for c in cells if c.strip()):
+            for c in cells:
+                c = c.strip()
+                if c.startswith(':') and c.endswith(':'):
+                    alignments.append('center')
+                elif c.endswith(':'):
+                    alignments.append('right')
+                else:
+                    alignments.append('left')
+            sep_idx = i
+            break
+
+    if sep_idx is not None:
+        header = parsed[:sep_idx]
+        body = parsed[sep_idx + 1:]
+    else:
+        header = [parsed[0]] if parsed else []
+        body = parsed[1:]
+        alignments = ['left'] * (len(parsed[0]) if parsed else 0)
+
+    all_rows = header + body
+    if not all_rows:
+        return ''
+
+    ncols = max(len(r) for r in all_rows)
+    for r in all_rows:
+        while len(r) < ncols:
+            r.append('')
+    while len(alignments) < ncols:
+        alignments.append('left')
+
+    # Format cells and compute column widths
+    formatted = [[render_inline(c) for c in r] for r in all_rows]
+    col_widths = [
+        max(visible_len(r[c]) for r in formatted)
+        for c in range(ncols)
+    ]
+    col_widths = [max(w, 3) for w in col_widths]
+
+    def h_line(l, m, r_ch):
+        segs = ['─' * (w + 2) for w in col_widths]
+        return DIM + l + m.join(segs) + r_ch + RESET
+
+    def data_line(cells, bold=False):
+        parts = []
+        for i, (cell, w) in enumerate(zip(cells, col_widths)):
+            inner = (BOLD + strip_ansi(cell) + RESET) if bold else cell
+            aligned = pad_to(inner, w + (visible_len(inner) - visible_len(strip_ansi(inner))),
+                             alignments[i] if i < len(alignments) else 'left')
+            parts.append(f' {aligned} ')
+        v = DIM + '│' + RESET
+        return v + (DIM + '│' + RESET).join(parts) + v
+
+    out = [h_line('┌', '┬', '┐')]
+    for row in formatted[:len(header)]:
+        out.append(data_line(row, bold=True))
+    if header:
+        out.append(h_line('├', '┼', '┤'))
+    for row in formatted[len(header):]:
+        out.append(data_line(row))
+    out.append(h_line('└', '┴', '┘'))
+    return '\n'.join(out)
+
+
+def render_blockquote(lines):
+    parts = []
+    for line in lines:
+        text = re.sub(r'^>\s?', '', line)
+        text = render_inline(text)
+        parts.append(f'{GREEN}▐ {RESET}{DIM}{text}{RESET}')
+    return '\n'.join(parts)
+
+
+def render_list_item(marker, text, indent):
+    text = render_inline(text)
+    prefix = ' ' * indent
+    if re.match(r'^\d+[.)]$', marker):
+        return f'{prefix}{BR_YELLOW}{marker}{RESET} {text}'
+    bullets = ['•', '◦', '▪', '▸']
+    b = bullets[min(indent // 2, len(bullets) - 1)]
+    return f'{prefix}{BR_CYAN}{b}{RESET} {text}'
+
+
+def render_markdown(text):
+    width = term_width()
+    lines = text.split('\n')
+    output = []
+    i = 0
+
+    while i < len(lines):
+        line = lines[i]
+
+        # Fenced code block
+        m = re.match(r'^(`{3,}|~{3,})\s*(\S*)', line)
+        if m:
+            fence_char = m.group(1)[0]
+            fence_len = len(m.group(1))
+            lang = m.group(2)
+            code = []
+            i += 1
+            while i < len(lines):
+                if re.match(
+                    r'^' + re.escape(fence_char) + '{' + str(fence_len) + r',}\s*$',
+                    lines[i],
+                ):
+                    i += 1
+                    break
+                code.append(lines[i])
+                i += 1
+            output.append(render_code_block(code, lang))
+            continue
+
+        # Header
+        m = re.match(r'^(#{1,6})\s+(.+?)(?:\s+#+)?\s*$', line)
+        if m:
+            output.append(render_header(len(m.group(1)), m.group(2), width))
+            i += 1
+            continue
+
+        # Horizontal rule
+        if re.match(r'^(\s*[-*_]\s*){3,}$', line):
+            output.append(DIM + '─' * width + RESET)
+            i += 1
+            continue
+
+        # Table (requires separator on line i+1)
+        if '|' in line and i + 1 < len(lines) and re.match(
+            r'^\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$', lines[i + 1]
+        ):
+            table = []
+            while i < len(lines) and '|' in lines[i]:
+                table.append(lines[i])
+                i += 1
+            output.append(render_table(table))
+            continue
+
+        # Blockquote
+        if line.startswith('>'):
+            bq = []
+            while i < len(lines) and lines[i].startswith('>'):
+                bq.append(lines[i])
+                i += 1
+            output.append(render_blockquote(bq))
+            continue
+
+        # Unordered list item
+        m = re.match(r'^(\s*)([-*+])\s+(.+)', line)
+        if m:
+            items = []
+            while i < len(lines):
+                lm = re.match(r'^(\s*)([-*+])\s+(.+)', lines[i])
+                if lm:
+                    items.append(render_list_item(lm.group(2), lm.group(3), len(lm.group(1))))
+                    i += 1
+                elif lines[i].strip() == '' and i + 1 < len(lines) and re.match(r'^\s*[-*+]\s+', lines[i + 1]):
+                    items.append('')
+                    i += 1
+                else:
+                    break
+            output.append('\n'.join(items))
+            continue
+
+        # Ordered list item
+        m = re.match(r'^(\s*)(\d+[.)])\s+(.+)', line)
+        if m:
+            items = []
+            while i < len(lines):
+                lm = re.match(r'^(\s*)(\d+[.)])\s+(.+)', lines[i])
+                if lm:
+                    items.append(render_list_item(lm.group(2), lm.group(3), len(lm.group(1))))
+                    i += 1
+                elif lines[i].strip() == '' and i + 1 < len(lines) and re.match(r'^\s*\d+[.)]\s+', lines[i + 1]):
+                    items.append('')
+                    i += 1
+                else:
+                    break
+            output.append('\n'.join(items))
+            continue
+
+        # Blank line
+        if not line.strip():
+            output.append('')
+            i += 1
+            continue
+
+        # Paragraph — collect contiguous non-blank, non-block lines
+        para = []
+        while i < len(lines) and lines[i].strip():
+            if re.match(r'^(#{1,6}\s|`{3}|~{3}|>|(\s*[-*_]\s*){3,}$)', lines[i]):
+                break
+            if re.match(r'^\s*[-*+]\s+', lines[i]) or re.match(r'^\s*\d+[.)]\s+', lines[i]):
+                break
+            # Check if next line is a table separator
+            if '|' in lines[i] and i + 1 < len(lines) and re.match(
+                r'^\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$', lines[i + 1]
+            ):
+                break
+            para.append(lines[i])
+            i += 1
+        if para:
+            output.append(render_inline(' '.join(para)))
+
+    return '\n'.join(output)
+
+
+def main():
+    if len(sys.argv) > 1 and sys.argv[1] != '-':
+        with open(sys.argv[1]) as f:
+            text = f.read()
+    else:
+        text = sys.stdin.read()
+    print(render_markdown(text))
+
+
+if __name__ == '__main__':
+    main()
