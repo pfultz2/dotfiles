@@ -1,0 +1,63 @@
+{
+  "env": {
+    "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(cd:*)",
+      "Bash(cmake:*)",
+      "Bash(ctest:*)",
+      "Bash(curl:*)",
+      "Bash(do echo:*)",
+      "Bash(done)",
+      "Bash(echo:*)",
+      "Bash(find:*)",
+      "Bash(for i:*)",
+      "Bash(g++:*)",
+      "Bash(gcc:*)",
+      "Bash(git diff *)",
+      "Bash(git log:*)",
+      "Bash(git status:*)",
+      "Bash(grep:*)",
+      "Bash(head:*)",
+      "Bash(ls:*)",
+      "Bash(make -C *)",
+      "Bash(make:*)",
+      "Bash(nproc:*)",
+      "Bash(sort -t:*)",
+      "Bash(sort:*)",
+      "Bash(tail:*)",
+      "Bash(tee:*)",
+      "Bash(xargs ls:*)",
+      "Bash(xargs:*)",
+      "Read(//tmp/**)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebSearch"
+    ],
+    "deny": [],
+    "defaultMode": "default"
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/ask_on_delete.py\""
+          }
+        ]
+      }
+    ]
+  },
+  "alwaysThinkingEnabled": true,
+  "effortLevel": "xhigh",
+  "autoUpdatesChannel": "stable",
+  "minimumVersion": "2.1.80",
+  "showThinkingSummaries": true,
+  "theme": "dark-ansi",
+  "remoteControlAtStartup": true,
+  "agentPushNotifEnabled": true
+}
