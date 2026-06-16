@@ -34,6 +34,8 @@ if [ "$(uname)" == "Darwin" ]; then
     ln -s "$DOTFILES/etc/mac/DefaultKeyBinding.dict" ~/Library/KeyBindings/DefaultKeyBinding.dict
 fi
 
+mkdir -p ~/.claude
+
 echo "Link settings.json"
 ln -s $DOTFILES/etc/claude/settings.json ~/.claude/settings.json
 
