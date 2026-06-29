@@ -5,7 +5,7 @@ exclude_sync = [
     '.hg',
     '.git',
     '*build/',
-    'build*/',
+    'build[0-9]*/',
     '.tox',
     '*.co',
     '*.deb',
@@ -140,7 +140,7 @@ def rsync(src, dst, exclude=None, delete=False, shallow=False, quiet=False, show
         print(' '.join(cmd))
     return subprocess.run(cmd, **kwargs).returncode
 
-def remote_sync(args, f, pipe=None):
+def remote_sync(args, f, pipe=None, show=False):
     parser = argparse.ArgumentParser()
     parser.add_argument('file', help='file to sync with remote')
     parser.add_argument('--delete', '-d', action='store_true', help='delete files missing')
@@ -162,10 +162,10 @@ def remote_sync(args, f, pipe=None):
             os.makedirs(os.path.dirname(local))
     src, dst = f(local, remote)
     exclude = not pargs.all if os.path.isdir(local) else False
-    return rsync(src, dst, exclude=exclude_sync if exclude else [], delete=pargs.delete, shallow=pargs.shallow, quiet=pargs.quiet, stdout=pipe, stderr=subprocess.STDOUT)
+    return rsync(src, dst, show=show, exclude=exclude_sync if exclude else [], delete=pargs.delete, shallow=pargs.shallow, quiet=pargs.quiet, stdout=pipe, stderr=subprocess.STDOUT)
 
-def pull(args, pipe=None):
-    return remote_sync(args, lambda local, remote: (remote, local), pipe=pipe)
+def pull(args, pipe=None, show=False):
+    return remote_sync(args, lambda local, remote: (remote, local), pipe=pipe, show=show)
 
-def push(args, pipe=None):
-    return remote_sync(args, lambda local, remote: (local, remote), pipe=pipe)
+def push(args, pipe=None, show=False):
+    return remote_sync(args, lambda local, remote: (local, remote), pipe=pipe, show=show)
