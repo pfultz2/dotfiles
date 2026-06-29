@@ -37,10 +37,10 @@
 		".git",
 		".hg",
 		".pytest-cache",
+		".pytest_cache",
 		".svn",
 		".tox",
 		"build",
-		"cget",
 		"CVS",
 		"daca"
 	],
