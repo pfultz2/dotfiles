@@ -33,3 +33,11 @@ if [ "$(uname)" == "Darwin" ]; then
     mkdir -p ~/Library/KeyBindings
     ln -s "$DOTFILES/etc/mac/DefaultKeyBinding.dict" ~/Library/KeyBindings/DefaultKeyBinding.dict
 fi
+
+mkdir -p ~/.claude
+
+echo "Link settings.json"
+ln -s $DOTFILES/etc/claude/settings.json ~/.claude/settings.json
+
+echo "Link ask_on_delete.py"
+ln -s $DOTFILES/etc/claude/ask_on_delete.py ~/.claude/ask_on_delete.py
