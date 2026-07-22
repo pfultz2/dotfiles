@@ -16,4 +16,4 @@ else
 fi
 export username=$(id -nu)
 echo "docker build -t $2"
-cat $DOTFILES/docker/dev.docker | envsubst | docker build -t $2 -
+cat $DOTFILES/docker/dev.docker | envsubst '$docker_base $user_id $group_id $username' | docker build -t $2 -

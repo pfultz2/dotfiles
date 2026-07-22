@@ -77,6 +77,7 @@ RUN npm install -g @anthropic-ai/claude-code
 
 RUN mkdir -p /opt/cursor-agent
 RUN curl -fSL --retry 3 --retry-delay 2 -A "Mozilla/5.0" "https://downloads.cursor.com/lab/${CURSOR_CLI_VERSION}/linux/${CURSOR_ARCH}/agent-cli-package.tar.gz" | tar -xzC /opt/cursor-agent
+RUN ln -sf "$(find /opt/cursor-agent -type f -name cursor-agent | head -n1)" /usr/local/bin/cursor-agent
 
 RUN pip install cget backports.lzma
 
@@ -114,6 +115,7 @@ RUN ln -s /claude /home/${username}/.claude
 # cursor-agent auto-updates on start into $HOME/.local/share/cursor-agent/versions.
 # Pre-creating that dir without exec perms stops it from swapping in a new build.
 RUN mkdir -p $HOME/.local/share/cursor-agent/versions && chmod -x $HOME/.local/share/cursor-agent/versions
+RUN mkdir -p $HOME/.cursor
 
 RUN ls /root/.wine/ && cp -r /root/.wine ~/ || echo "Skip wine"
 

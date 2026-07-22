@@ -81,6 +81,8 @@ def build_docker_command():
     command.add_mount('~/.codex', '/.codex')
     command.add_env_var('CODEX_HOME', '/.codex')
 
+    command.add_mount('~/.cursor')
+
     command.add_env_var_file('GH_TOKEN', '~/.gh_token')
     command.add_env_var_file('CURSOR_API_KEY', '~/.cursor_api_key')
     
