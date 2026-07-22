@@ -39,6 +39,7 @@
     "deny": [],
     "defaultMode": "default"
   },
+  "model": "claude-fable-5[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -56,6 +57,7 @@
   "effortLevel": "xhigh",
   "autoUpdatesChannel": "stable",
   "minimumVersion": "2.1.80",
+  "tui": "fullscreen",
   "showThinkingSummaries": true,
   "theme": "dark-ansi",
   "remoteControlAtStartup": true,
