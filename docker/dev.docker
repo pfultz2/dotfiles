@@ -1,5 +1,12 @@
 FROM ${docker_base}
 
+# Pin the CLI version for reproducible builds.
+# To find the current version without running anything, inspect (don't execute)
+# the official installer and grep the version out of it:
+#   curl -fsSL https://cursor.com/install | grep -oE 'lab/[0-9]{4}\.[0-9]{2}\.[0-9]{2}-[0-9a-f]+'
+ARG CURSOR_CLI_VERSION=2026.07.17-3e2a980
+ARG CURSOR_ARCH=x64
+
 # Workaround https://unix.stackexchange.com/questions/2544/how-to-work-around-release-file-expired-problem-on-a-local-mirror
 RUN echo "Acquire::Check-Valid-Until \"false\";\nAcquire::Check-Date \"false\";" | cat > /etc/apt/apt.conf.d/10no--check-valid-until
 
@@ -68,6 +75,9 @@ RUN npm install -g @github/copilot
 RUN npm install -g @openai/codex
 RUN npm install -g @anthropic-ai/claude-code
 
+RUN mkdir -p /opt/cursor-agent
+RUN curl -fSL --retry 3 --retry-delay 2 -A "Mozilla/5.0" "https://downloads.cursor.com/lab/${CURSOR_CLI_VERSION}/linux/${CURSOR_ARCH}/agent-cli-package.tar.gz" | tar -xzC /opt/cursor-agent
+
 RUN pip install cget backports.lzma
 
 # Install vscode
@@ -100,6 +110,10 @@ RUN /home/${username}/dotfiles/setup/bootstrap.sh
 # Replace claude settings with claude settings on the system
 RUN rm -rf /home/${username}/.claude
 RUN ln -s /claude /home/${username}/.claude
+
+# cursor-agent auto-updates on start into $HOME/.local/share/cursor-agent/versions.
+# Pre-creating that dir without exec perms stops it from swapping in a new build.
+RUN mkdir -p $HOME/.local/share/cursor-agent/versions && chmod -x $HOME/.local/share/cursor-agent/versions
 
 RUN ls /root/.wine/ && cp -r /root/.wine ~/ || echo "Skip wine"
 

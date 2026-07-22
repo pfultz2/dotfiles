@@ -18,9 +18,11 @@ class RemoteEdit(sublime_plugin.EventListener):
 class RemotePullCommand(sublime_plugin.WindowCommand):
     def run(self):
         dirname = self.window.folders()[0]
-        sublime.set_timeout_async(lambda: remote.pull([dirname]), 0)
+        print("Remote pull: ", dirname)
+        sublime.set_timeout_async(lambda: remote.pull([dirname], show=True), 0)
 
 class RemotePushCommand(sublime_plugin.WindowCommand):
     def run(self):
         dirname = self.window.folders()[0]
-        sublime.set_timeout_async(lambda: remote.push([dirname]), 0)
+        print("Remote push: ", dirname)
+        sublime.set_timeout_async(lambda: remote.push([dirname], show=True), 0)
