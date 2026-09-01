@@ -60,6 +60,7 @@
   "tui": "fullscreen",
   "showThinkingSummaries": true,
   "theme": "dark-ansi",
+  "switchModelsOnFlag": false,
   "remoteControlAtStartup": true,
   "agentPushNotifEnabled": true
 }

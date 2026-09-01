@@ -82,11 +82,11 @@ RUN ln -sf "$(find /opt/cursor-agent -type f -name cursor-agent | head -n1)" /us
 RUN pip install cget backports.lzma
 
 # Install vscode
-RUN wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
-RUN install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
-RUN sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
-RUN rm -f packages.microsoft.gpg
-RUN apt-get update && apt-get install -y code
+# RUN wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
+# RUN install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
+# RUN sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
+# RUN rm -f packages.microsoft.gpg
+# RUN apt-get update && apt-get install -y code
 
 RUN mkdir -p /data
 RUN mkdir -p /ccache
@@ -94,6 +94,10 @@ RUN mkdir -p /.bash_history.d
 ENV CCACHE_DIR=/ccache
 ENV CLAUDE_CONFIG_DIR=/claude
 ENV GH_CONFIG_DIR=/gh
+
+# Delete the default ubuntu user provided by ubuntu 24.04 as it may interfere
+# with my user
+RUN userdel -r ubuntu || true
 
 RUN groupadd --force --gid ${group_id} ${username}
 RUN useradd --non-unique --create-home --shell /bin/bash -u ${user_id} --gid ${group_id} ${username}
