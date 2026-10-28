@@ -39,6 +39,9 @@ mkdir -p ~/.claude
 echo "Link settings.json"
 ln -s $DOTFILES/etc/claude/settings.json ~/.claude/settings.json
 
+echo "Link CLAUDE.md"
+ln -s $DOTFILES/etc/claude/CLAUDE.md ~/.claude/CLAUDE.md
+
 echo "Link ask_on_delete.py"
 ln -s $DOTFILES/etc/claude/ask_on_delete.py ~/.claude/ask_on_delete.py
 
