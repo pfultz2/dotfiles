@@ -1,9 +1,131 @@
 {
-  "env": {
-    "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1"
+  "agentPushNotifEnabled" : true,
+  "alwaysThinkingEnabled" : true,
+  "autoUpdatesChannel" : "stable",
+  "effortLevel" : "xhigh",
+  "env" : {
+    "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING" : "1"
   },
-  "permissions": {
-    "allow": [
+  "hooks" : {
+    "Notification" : [
+      {
+        "hooks" : [
+          {
+            "command" : "~\/.claude\/hooks\/iterm2.sh \/Users\/paul\/.config\/iterm2\/cc-status",
+            "type" : "command"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest" : [
+      {
+        "hooks" : [
+          {
+            "command" : "~\/.claude\/hooks\/iterm2.sh \/Users\/paul\/.config\/iterm2\/cc-status",
+            "type" : "command"
+          }
+        ]
+      }
+    ],
+    "PostToolUse" : [
+      {
+        "hooks" : [
+          {
+            "command" : "~\/.claude\/hooks\/iterm2.sh \/Users\/paul\/.config\/iterm2\/cc-status",
+            "type" : "command"
+          }
+        ]
+      }
+    ],
+    "PreToolUse" : [
+      {
+        "hooks" : [
+          {
+            "command" : "python3 \"${CLAUDE_CONFIG_DIR:-$HOME\/.claude}\/ask_on_delete.py\"",
+            "type" : "command"
+          }
+        ],
+        "matcher" : "Bash"
+      },
+      {
+        "hooks" : [
+          {
+            "command" : "~\/.claude\/hooks\/iterm2.sh \/Users\/paul\/.config\/iterm2\/cc-status",
+            "type" : "command"
+          }
+        ]
+      }
+    ],
+    "SessionEnd" : [
+      {
+        "hooks" : [
+          {
+            "command" : "~\/.claude\/hooks\/iterm2.sh \/Users\/paul\/.config\/iterm2\/cc-status",
+            "type" : "command"
+          }
+        ]
+      }
+    ],
+    "SessionStart" : [
+      {
+        "hooks" : [
+          {
+            "command" : "~\/.claude\/hooks\/iterm2.sh \/Users\/paul\/.config\/iterm2\/cc-status",
+            "type" : "command"
+          }
+        ]
+      }
+    ],
+    "Stop" : [
+      {
+        "hooks" : [
+          {
+            "command" : "~\/.claude\/hooks\/iterm2.sh \/Users\/paul\/.config\/iterm2\/cc-status",
+            "type" : "command"
+          }
+        ]
+      }
+    ],
+    "StopFailure" : [
+      {
+        "hooks" : [
+          {
+            "command" : "~\/.claude\/hooks\/iterm2.sh \/Users\/paul\/.config\/iterm2\/cc-status",
+            "type" : "command"
+          }
+        ]
+      }
+    ],
+    "SubagentStop" : [
+      {
+        "hooks" : [
+          {
+            "command" : "~\/.claude\/hooks\/iterm2.sh \/Users\/paul\/.config\/iterm2\/cc-status",
+            "type" : "command"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit" : [
+      {
+        "hooks" : [
+          {
+            "command" : "~\/.claude\/hooks\/iterm2.sh \/Users\/paul\/.config\/iterm2\/cc-status",
+            "type" : "command"
+          }
+        ]
+      }
+    ]
+  },
+  "minimumVersion" : "2.1.80",
+  "model" : "opus[1m]",
+  "modelSettings" : {
+    "claude-opus-5-5" : {
+      "effortLevel" : "xhigh"
+    }
+  },
+  "permissions" : {
+    "allow" : [
       "Bash(cat:*)",
       "Bash(cd:*)",
       "Bash(cmake:*)",
@@ -31,36 +153,20 @@
       "Bash(tee:*)",
       "Bash(xargs ls:*)",
       "Bash(xargs:*)",
-      "Read(//tmp/**)",
+      "Read(\/\/tmp\/**)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebSearch"
     ],
-    "deny": [],
-    "defaultMode": "default"
-  },
-  "model": "claude-fable-5[1m]",
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/ask_on_delete.py\""
-          }
-        ]
-      }
+    "defaultMode" : "default",
+    "deny" : [
+
     ]
   },
-  "alwaysThinkingEnabled": true,
-  "effortLevel": "xhigh",
-  "autoUpdatesChannel": "stable",
-  "minimumVersion": "2.1.80",
-  "tui": "fullscreen",
-  "showThinkingSummaries": true,
-  "theme": "dark-ansi",
-  "switchModelsOnFlag": false,
-  "remoteControlAtStartup": true,
-  "agentPushNotifEnabled": true
+  "respondToBashCommands": false,
+  "remoteControlAtStartup" : true,
+  "showThinkingSummaries" : true,
+  "switchModelsOnFlag" : false,
+  "theme" : "dark-ansi",
+  "tui" : "fullscreen"
 }

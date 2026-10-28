@@ -41,3 +41,7 @@ ln -s $DOTFILES/etc/claude/settings.json ~/.claude/settings.json
 
 echo "Link ask_on_delete.py"
 ln -s $DOTFILES/etc/claude/ask_on_delete.py ~/.claude/ask_on_delete.py
+
+echo "Link iterm2.sh"
+mkdir -p ~/.claude/hooks
+ln -s $DOTFILES/etc/claude/hooks/iterm2.sh ~/.claude/hooks/iterm2.sh
