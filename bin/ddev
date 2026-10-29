@@ -7,6 +7,27 @@
 #
 
 export docker_base=$1
+shift 1
+CONTAINER=$1
+shift 1
+BUILD_ARGS=()
+while (( "$#" ))
+do
+    arg="$1"
+    case "$arg" in
+    -f)
+        shift
+        ;;
+    --*)
+        BUILD_ARGS+=($1)
+        ;;
+    *)
+        BUILD_ARGS+=(--build-arg $1)
+        ;;
+    esac
+    shift
+done
+
 if [ $OSX ]; then
     export user_id=0
     export group_id=0
@@ -15,5 +36,5 @@ else
     export group_id=$(id -g)
 fi
 export username=$(id -nu)
-echo "docker build -t $2"
-cat $DOTFILES/docker/dev.docker | envsubst '$docker_base $user_id $group_id $username' | docker build -t $2 -
+echo "docker build -t $CONTAINER ${BUILD_ARGS[@]}"
+cat $DOTFILES/docker/dev.docker | envsubst '$docker_base $user_id $group_id $username' | docker build -t $CONTAINER ${BUILD_ARGS[@]} -

@@ -23,6 +23,6 @@ done
 
 echo "docker build -t ${CONTAINER} ${BUILD_ARGS[@]} ."
 docker build -t ${CONTAINER} ${BUILD_ARGS[@]} . && \
-echo "ddev ${CONTAINER} ${CONTAINER}-dev" && \
-ddev ${CONTAINER} ${CONTAINER}-dev
+echo "ddev ${CONTAINER} ${CONTAINER}-dev ${BUILD_ARGS[@]}" && \
+ddev ${CONTAINER} ${CONTAINER}-dev ${BUILD_ARGS[@]}
 
