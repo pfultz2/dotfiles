@@ -169,5 +169,6 @@
   "showThinkingSummaries" : true,
   "switchModelsOnFlag" : false,
   "theme" : "dark-ansi",
-  "tui" : "fullscreen"
+  "tui" : "fullscreen",
+  "hasCompletedOnboarding": true
 }

@@ -71,8 +71,8 @@ RUN npm cache clean -f
 RUN npm install -g n
 RUN n 22
 
-RUN npm install -g @github/copilot
-RUN npm install -g @openai/codex
+# RUN npm install -g @github/copilot
+# RUN npm install -g @openai/codex
 RUN npm install -g @anthropic-ai/claude-code
 
 RUN mkdir -p /opt/cursor-agent
