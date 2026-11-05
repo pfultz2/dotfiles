@@ -45,6 +45,9 @@ ln -s $DOTFILES/etc/claude/CLAUDE.md ~/.claude/CLAUDE.md
 echo "Link ask_on_delete.py"
 ln -s $DOTFILES/etc/claude/ask_on_delete.py ~/.claude/ask_on_delete.py
 
+echo "Link statusline.sh"
+ln -s $DOTFILES/etc/claude/statusline.sh ~/.claude/statusline.sh
+
 echo "Link iterm2.sh"
 mkdir -p ~/.claude/hooks
 ln -s $DOTFILES/etc/claude/hooks/iterm2.sh ~/.claude/hooks/iterm2.sh

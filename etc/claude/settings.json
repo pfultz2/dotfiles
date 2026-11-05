@@ -1,132 +1,10 @@
 {
-  "agentPushNotifEnabled" : true,
-  "alwaysThinkingEnabled" : true,
-  "autoUpdatesChannel" : "stable",
-  "effortLevel" : "xhigh",
-  "env" : {
-    "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING" : "1",
-    "CLAUDE_CODE_ACCESSIBILITY": 1
+  "env": {
+    "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1",
+    "CLAUDE_CODE_ACCESSIBILITY": "1"
   },
-  "hooks" : {
-    "Notification" : [
-      {
-        "hooks" : [
-          {
-            "command" : "~\/.claude\/hooks\/iterm2.sh \/Users\/paul\/.config\/iterm2\/cc-status",
-            "type" : "command"
-          }
-        ]
-      }
-    ],
-    "PermissionRequest" : [
-      {
-        "hooks" : [
-          {
-            "command" : "~\/.claude\/hooks\/iterm2.sh \/Users\/paul\/.config\/iterm2\/cc-status",
-            "type" : "command"
-          }
-        ]
-      }
-    ],
-    "PostToolUse" : [
-      {
-        "hooks" : [
-          {
-            "command" : "~\/.claude\/hooks\/iterm2.sh \/Users\/paul\/.config\/iterm2\/cc-status",
-            "type" : "command"
-          }
-        ]
-      }
-    ],
-    "PreToolUse" : [
-      {
-        "hooks" : [
-          {
-            "command" : "python3 \"${CLAUDE_CONFIG_DIR:-$HOME\/.claude}\/ask_on_delete.py\"",
-            "type" : "command"
-          }
-        ],
-        "matcher" : "Bash"
-      },
-      {
-        "hooks" : [
-          {
-            "command" : "~\/.claude\/hooks\/iterm2.sh \/Users\/paul\/.config\/iterm2\/cc-status",
-            "type" : "command"
-          }
-        ]
-      }
-    ],
-    "SessionEnd" : [
-      {
-        "hooks" : [
-          {
-            "command" : "~\/.claude\/hooks\/iterm2.sh \/Users\/paul\/.config\/iterm2\/cc-status",
-            "type" : "command"
-          }
-        ]
-      }
-    ],
-    "SessionStart" : [
-      {
-        "hooks" : [
-          {
-            "command" : "~\/.claude\/hooks\/iterm2.sh \/Users\/paul\/.config\/iterm2\/cc-status",
-            "type" : "command"
-          }
-        ]
-      }
-    ],
-    "Stop" : [
-      {
-        "hooks" : [
-          {
-            "command" : "~\/.claude\/hooks\/iterm2.sh \/Users\/paul\/.config\/iterm2\/cc-status",
-            "type" : "command"
-          }
-        ]
-      }
-    ],
-    "StopFailure" : [
-      {
-        "hooks" : [
-          {
-            "command" : "~\/.claude\/hooks\/iterm2.sh \/Users\/paul\/.config\/iterm2\/cc-status",
-            "type" : "command"
-          }
-        ]
-      }
-    ],
-    "SubagentStop" : [
-      {
-        "hooks" : [
-          {
-            "command" : "~\/.claude\/hooks\/iterm2.sh \/Users\/paul\/.config\/iterm2\/cc-status",
-            "type" : "command"
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit" : [
-      {
-        "hooks" : [
-          {
-            "command" : "~\/.claude\/hooks\/iterm2.sh \/Users\/paul\/.config\/iterm2\/cc-status",
-            "type" : "command"
-          }
-        ]
-      }
-    ]
-  },
-  "minimumVersion" : "2.1.80",
-  "model" : "opus[1m]",
-  "modelSettings" : {
-    "claude-opus-5-5" : {
-      "effortLevel" : "xhigh"
-    }
-  },
-  "permissions" : {
-    "allow" : [
+  "permissions": {
+    "allow": [
       "Bash(cat:*)",
       "Bash(cd:*)",
       "Bash(cmake:*)",
@@ -154,21 +32,148 @@
       "Bash(tee:*)",
       "Bash(xargs ls:*)",
       "Bash(xargs:*)",
-      "Read(\/\/tmp\/**)",
+      "Read(//tmp/**)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebSearch"
     ],
-    "defaultMode" : "default",
-    "deny" : [
-
+    "deny": [],
+    "defaultMode": "default"
+  },
+  "model": "opus",
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/iterm2.sh /Users/paul/.config/iterm2/cc-status"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/iterm2.sh /Users/paul/.config/iterm2/cc-status"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/iterm2.sh /Users/paul/.config/iterm2/cc-status"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/ask_on_delete.py\""
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/iterm2.sh /Users/paul/.config/iterm2/cc-status"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/iterm2.sh /Users/paul/.config/iterm2/cc-status"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/iterm2.sh /Users/paul/.config/iterm2/cc-status"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/iterm2.sh /Users/paul/.config/iterm2/cc-status"
+          }
+        ]
+      }
+    ],
+    "StopFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/iterm2.sh /Users/paul/.config/iterm2/cc-status"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/iterm2.sh /Users/paul/.config/iterm2/cc-status"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/iterm2.sh /Users/paul/.config/iterm2/cc-status"
+          }
+        ]
+      }
     ]
   },
   "respondToBashCommands": false,
-  "remoteControlAtStartup" : true,
-  "showThinkingSummaries" : true,
-  "switchModelsOnFlag" : false,
-  "theme" : "dark-ansi",
-  "tui" : "fullscreen",
-  "hasCompletedOnboarding": true
+  "alwaysThinkingEnabled": true,
+  "effortLevel": "xhigh",
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "xhigh"
+    },
+    "claude-fable-5-1": {
+      "effortLevel": "medium"
+    }
+  },
+  "autoUpdatesChannel": "stable",
+  "minimumVersion": "2.1.80",
+  "tui": "fullscreen",
+  "showThinkingSummaries": true,
+  "theme": "dark-ansi",
+  "switchModelsOnFlag": false,
+  "remoteControlAtStartup": true,
+  "agentPushNotifEnabled": true,
+  "hasCompletedOnboarding": true,
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  }
 }
