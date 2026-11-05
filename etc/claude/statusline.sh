@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Claude Code status line: model, effort, context window, weekly and Fable weekly usage.
+# Claude Code status line: model, effort, context window, weekly and Fable weekly usage, PR number.
 # Reads the status line JSON from stdin.
 
 input=$(cat)
@@ -10,13 +10,17 @@ mapfile -t fields < <(jq -r '
     .effort.level // "",
     (.context_window.used_percentage | pct),
     (.rate_limits.seven_day.used_percentage | pct),
-    (.rate_limits.seven_day != null)
+    (.rate_limits.seven_day != null),
+    (.pr.number // "" | tostring),
+    .pr.kind // ""
 ' <<<"$input")
 model=${fields[0]}
 effort=${fields[1]}
 ctx=${fields[2]}
 week=${fields[3]}
 subscription=${fields[4]}
+pr=${fields[5]}
+pr_kind=${fields[6]}
 
 # Claude Code does not pass the Fable weekly usage to the status line, so it is
 # read from the claude.ai usage endpoint that /usage uses. The endpoint is
@@ -93,4 +97,7 @@ out=$'\033[1m'"$model"$'\033[0m'
 [ -n "$ctx" ] && out+="$sep$(bar ctx "$ctx")"
 [ -n "$week" ] && out+="$sep$(bar week "$week")"
 [ -n "$fable" ] && out+="$sep$(bar fable "$fable")"
+if [ -n "$pr" ]; then
+    if [ "$pr_kind" = mr ]; then out+="$sep!$pr"; else out+="$sep#$pr"; fi
+fi
 printf '%s' "$out"
