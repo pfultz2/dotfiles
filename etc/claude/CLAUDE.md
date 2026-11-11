@@ -11,3 +11,13 @@
   structures or engineering.
 - Instead, say what you mean directly: "important", "essential",
   "the main reason", "this depends on X".
+
+# Code comments
+
+- Write concise, direct comments. Explain why the code does something or
+  note behavior that isn't clear from reading it.
+- Don't state the obvious: no comments that restate the code, the
+  function name, or the variable name (e.g. `// increment i` above `i++`).
+- Leave out unrelated information, such as the history of a change,
+  references to the current task or conversation, or notes about code
+  that was removed.
