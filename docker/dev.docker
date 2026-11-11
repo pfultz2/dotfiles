@@ -37,6 +37,7 @@ RUN apt-get install -y \
     git \
     gpg \
     iputils-ping \
+    jq \
     less \
     liblzma-dev \
     ltrace \

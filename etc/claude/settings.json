@@ -153,6 +153,10 @@
     ]
   },
   "respondToBashCommands": false,
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  },
   "alwaysThinkingEnabled": true,
   "effortLevel": "xhigh",
   "modelSettings": {
@@ -160,7 +164,7 @@
       "effortLevel": "xhigh"
     },
     "claude-fable-5-1": {
-      "effortLevel": "medium"
+      "effortLevel": "high"
     }
   },
   "autoUpdatesChannel": "stable",
@@ -171,9 +175,5 @@
   "switchModelsOnFlag": false,
   "remoteControlAtStartup": true,
   "agentPushNotifEnabled": true,
-  "hasCompletedOnboarding": true,
-  "statusLine": {
-    "type": "command",
-    "command": "~/.claude/statusline.sh"
-  }
+  "hasCompletedOnboarding": true
 }
