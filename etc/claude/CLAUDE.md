@@ -14,10 +14,18 @@
 
 # Code comments
 
-- Write concise, direct comments. Explain why the code does something or
-  note behavior that isn't clear from reading it.
-- Don't state the obvious: no comments that restate the code, the
-  function name, or the variable name (e.g. `// increment i` above `i++`).
-- Leave out unrelated information, such as the history of a change,
-  references to the current task or conversation, or notes about code
-  that was removed.
+Default to no comments. Clear names and structure should explain the
+code; every comment is one more thing to maintain.
+
+Comment only when a reader would likely misunderstand or break the code
+without it: a non-obvious reason, a workaround, a subtle invariant or
+edge case. Keep it to a line or two.
+
+Don't add:
+- comments that restate the code or names
+- section headers or step-by-step narration inside functions
+- doc comments on private or self-explanatory functions
+- notes about the change, removed code, or the current task
+
+Don't add comments to code you aren't otherwise changing. Before
+finishing, delete any comment in your diff that doesn't meet this bar.
